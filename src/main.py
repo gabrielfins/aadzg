@@ -1,6 +1,7 @@
 import pygame, os, paths
 from player import Player
 from obstacle import Obstacle
+from enemy import Enemy
 
 pygame.init()
 
@@ -13,6 +14,12 @@ background_sprite = pygame.transform.scale(pygame.image.load(os.path.join(paths.
 
 all_sprites = pygame.sprite.Group()
 all_obstacles = pygame.sprite.Group()
+grupo_obstaculos = pygame.sprite.Group()
+
+for i in range(15):
+    infectado = Enemy()
+    all_sprites.add(infectado)
+    grupo_obstaculos.add(infectado)
 
 obstacle = Obstacle(screen, 50, 100)
 all_obstacles.add(obstacle)
@@ -32,9 +39,15 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 running = False
 
-    all_sprites.update()
+    colisoes = pygame.sprite.spritecollide(player, grupo_obstaculos, False, pygame.sprite.collide_mask)
+
     screen.blit(background_sprite, (0, 0))
     all_sprites.draw(screen)
+
+    if colisoes:
+        pass
+    else:
+        all_sprites.update()
 
     pygame.display.flip()
 

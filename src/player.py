@@ -14,6 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.screen_rect = screen.get_rect()
         self.image = player_sprite.convert_alpha()
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect.x = self.screen_rect.width / 2 - self.rect.width / 2
         self.rect.y = self.screen_rect.height / 2 - self.rect.height / 2
         self.sprites_group = sprites_group
