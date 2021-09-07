@@ -1,7 +1,7 @@
 import pygame, os, paths
 from player import Player
 from obstacle import Obstacle
-from enemy import Enemy
+from enemy import Enemy, Enemy2
 
 pygame.init()
 
@@ -16,10 +16,14 @@ all_sprites = pygame.sprite.Group()
 all_obstacles = pygame.sprite.Group()
 grupo_obstaculos = pygame.sprite.Group()
 
-for i in range(15):
-    infectado = Enemy()
-    all_sprites.add(infectado)
-    grupo_obstaculos.add(infectado)
+cuspidor = Enemy2()
+all_sprites.add(cuspidor)
+grupo_obstaculos.add(cuspidor)
+
+for i in range(10):
+    corredor = Enemy()
+    all_sprites.add(corredor)
+    grupo_obstaculos.add(corredor)
 
 obstacle = Obstacle(screen, 50, 100)
 all_obstacles.add(obstacle)
