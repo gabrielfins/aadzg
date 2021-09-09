@@ -10,7 +10,7 @@ class Player(pg.sprite.Sprite):
         self.image = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'player.png')), (self.width, self.height)).convert_alpha()
         self.shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'syringe.png')), (34, 14)).convert_alpha()
         self.rect = self.image.get_rect()
-        self.hitbox = pg.Rect(self.rect.left, self.rect.top + self.rect.height - 34, self.rect.width, self.width)
+        self.hitbox = pg.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height - 40)
         self.rect.x = sprites.map.rect.width / 2 - self.rect.width / 2
         self.rect.y = sprites.map.rect.height / 2 - self.rect.height / 2
         self.speed = 4.5
@@ -40,7 +40,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.rect.clamp(sprites.map.rect)
 
         self.hitbox.x = self.rect.x
-        self.hitbox.y = self.rect.y + self.rect.height - 34
+        self.hitbox.bottom = self.rect.bottom
 
         if key[pg.K_LEFT] and key[pg.K_UP]:
             self.shoot(round(self.shot_speed / 2 * math.sqrt(2)), -1, -1, 135)
@@ -60,18 +60,25 @@ class Player(pg.sprite.Sprite):
             self.shoot(self.shot_speed, 0, 1, 270)
 
         for powerup in sprites.all_powerups:
-            if self.hitbox.colliderect(powerup.rect):
+            if self.hitbox.colliderect(powerup.hitbox):
                 self.speed = 7.5
                 powerup.kill()
-        
+
         for enemy in sprites.all_enemies:
-            if self.hitbox.colliderect(enemy.rect):
-                self.kill()
+            if self.hitbox.colliderect(enemy.hitbox):
+                self.die()
+
+        for enemy_shot in sprites.all_enemy_shots:
+            if self.hitbox.colliderect(enemy_shot.hitbox):
+                self.die()
         
     def shoot(self, shot_speed, horizontal_velocity, vertical_velocity, angle):
         current_shot = pg.time.get_ticks()
         if current_shot - self.last_shot >= self.shot_cooldown:
             self.last_shot = current_shot
-            shot = Shot(self.shot_image, self.rect.center, shot_speed, horizontal_velocity, vertical_velocity, angle)
+            shot = Shot(self.shot_image, self.rect.x + self.rect.width / 2, self.rect.y + self.rect.height / 2, shot_speed, horizontal_velocity, vertical_velocity, angle)
             sprites.all_syringes.add(shot)
             sprites.all_sprites.add(shot)
+
+    def die(self):
+        self.kill()

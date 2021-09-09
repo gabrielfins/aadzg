@@ -16,8 +16,8 @@ class Camera:
         return rect.move(self.camera.topleft)
 
     def update(self, target):
-        x = -target.rect.x + int(self.width / 4)
-        y = -target.rect.y + int(self.height / 4)
+        x = -target.rect.x - target.rect.width / 2 + int(self.width / 4)
+        y = -target.rect.y - target.rect.height / 2 + int(self.height / 4)
         
         x = min(0, x)
         x = max(-(self.width - self.width / 2), x)

@@ -6,5 +6,6 @@ class Powerup(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.image = image
         self.rect = image.get_rect()
+        self.hitbox = self.rect
         self.rect.x = x
         self.rect.y = y
