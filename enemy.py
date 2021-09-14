@@ -4,6 +4,7 @@ from random import randrange
 
 enemy_sprite_sheet = pg.image.load(os.path.join(paths.images_folder, 'bicho1.png'))
 enemy_sprite_sheet2 = pg.image.load(os.path.join(paths.images_folder, 'bicho2.png'))
+enemy_sprite_sheet3 = pg.image.load(os.path.join(paths.images_folder, 'bicho3.png'))
 
 
 class SeekingEnemy(pg.sprite.Sprite):
@@ -22,8 +23,8 @@ class SeekingEnemy(pg.sprite.Sprite):
         self.hitbox = pg.Rect(0, 0, 17 * 3, 17 * 3)
         self.hitbox.center = self.rect.center
         self.mask = pg.mask.from_surface(self.image)
-        self.rect.y = randrange(170, 310, 62)
-        self.rect.x = randrange(-100, 200, 60)
+        self.rect.y = randrange(500, 650, 62)
+        self.rect.x = randrange(-1500, 500, 88)
 
     def update(self):
         if self.index_lista > 6:
@@ -34,7 +35,7 @@ class SeekingEnemy(pg.sprite.Sprite):
 
         if self.rect.x > sprites.map.rect.width:
             self.rect.x = -100
-            self.rect.y = randrange(170, 310, 62)
+            self.rect.y = randrange(500, 650, 62)
 
         self.rect.x += 1
         self.hitbox.center = self.rect.center
@@ -61,8 +62,8 @@ class ShootingEnemy(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.hitbox = pg.Rect(0, 0, 17 * 3, 23 * 3)
         self.mask = pg.mask.from_surface(self.image)
-        self.rect.y = 70
-        self.rect.x = 80
+        self.rect.y = 300
+        self.rect.x = 620
         self.shot_speed = 5
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
@@ -91,3 +92,41 @@ class ShootingEnemy(pg.sprite.Sprite):
             shot = Shot(self.shot_image, self.rect.x + self.rect.width - 30, self.rect.y + 30, shot_speed, horizontal_velocity, vertical_velocity, 0)
             sprites.all_enemy_shots.add(shot)
             sprites.all_sprites.add(shot)
+
+class FlyingEnemy(pg.sprite.Sprite):
+    def __init__(self):
+        pg.sprite.Sprite.__init__(self)
+        self.image = enemy_sprite_sheet3.convert_alpha()
+        self.imgs_baiacu = []
+        for i in range(63):
+            img = enemy_sprite_sheet3.subsurface((i * 32, 0), (32, 32))
+            img = pg.transform.scale(img, (32 * 2, 32 * 2))
+            self.imgs_baiacu.append(img)
+
+        self.index_lista = 0
+        self.image = self.imgs_baiacu[self.index_lista]
+        self.rect = self.image.get_rect()
+        self.hitbox = pg.Rect(0, 0, 17 * 3, 17 * 3)
+        self.hitbox.center = self.rect.center
+        self.mask = pg.mask.from_surface(self.image)
+        self.rect.y = randrange(-1800, -400, 300)
+        self.rect.x = randrange(750, 1000, 80)
+
+    def update(self):
+        if self.index_lista > 62:
+            self.index_lista = 0
+
+        self.index_lista += 0.7
+        self.image = self.imgs_baiacu[int(self.index_lista)]
+
+        if self.rect.y > sprites.map.rect.height:
+            self.rect.x = randrange(750, 1000, 80)
+            self.rect.y = randrange(-1800, -400, 380)
+
+        self.rect.y += 4
+        self.hitbox.center = self.rect.center
+
+        for syringe in sprites.all_syringes:
+            if self.hitbox.colliderect(syringe):
+                self.kill()
+                syringe.kill()

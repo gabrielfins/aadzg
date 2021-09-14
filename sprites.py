@@ -3,7 +3,7 @@ from map import Map
 from camera import Camera
 from player import Player
 from powerup import Powerup
-from enemy import SeekingEnemy, ShootingEnemy
+from enemy import SeekingEnemy, ShootingEnemy, FlyingEnemy
 
 
 class YAwareGroup(pg.sprite.Group):
@@ -44,7 +44,12 @@ cuspidor = ShootingEnemy()
 all_enemies.add(cuspidor)
 all_sprites.add(cuspidor)
 
-for i in range(10):
+for i in range(15):
+    baiacu = FlyingEnemy()
+    all_enemies.add(baiacu)
+    all_sprites.add(baiacu)
+
+for i in range(15):
     corredor = SeekingEnemy()
     all_enemies.add(corredor)
     all_sprites.add(corredor)
