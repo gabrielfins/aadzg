@@ -1,7 +1,9 @@
 import pygame as pg, os, paths
 
-(WIDTH, HEIGHT) = (896, 608)
 FPS = 60
+WIDTH = 896
+HEIGHT = 608
+
 screen = pg.display.set_mode((WIDTH, HEIGHT))
 screen_rect = screen.get_rect()
 clock = pg.time.Clock()

@@ -9,3 +9,7 @@ class Powerup(pg.sprite.Sprite):
         self.hitbox = self.rect
         self.rect.x = x
         self.rect.y = y
+
+class Coffee(Powerup):
+    def __init__(self, image, x, y):
+        super().__init__(image, x, y)

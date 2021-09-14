@@ -1,19 +1,20 @@
 import pygame as pg, os, paths, sprites
-from shot import Shot
 from random import randrange
+from gameobjects.map import Map
+from gameobjects.shot import Shot
 
-enemy_sprite_sheet = pg.image.load(os.path.join(paths.images_folder, 'bicho1.png'))
-enemy_sprite_sheet2 = pg.image.load(os.path.join(paths.images_folder, 'bicho2.png'))
-enemy_sprite_sheet3 = pg.image.load(os.path.join(paths.images_folder, 'bicho3.png'))
+seeking_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'seeking-enemy.png'))
+shooting_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'shooting-enemy.png'))
+enemy_sprite_sheet3 = pg.image.load(os.path.join(paths.enemies_folder, 'bicho3.png'))
 
 
 class SeekingEnemy(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, map: Map):
         pg.sprite.Sprite.__init__(self)
-        self.image = enemy_sprite_sheet.convert_alpha()
+        self.image = seeking_enemy_sprite_sheet.convert_alpha()
         self.imgs_corredor = []
         for i in range(7):
-            img = enemy_sprite_sheet.subsurface((i * 32, 0), (32, 32))
+            img = seeking_enemy_sprite_sheet.subsurface((i * 32, 0), (32, 32))
             img = pg.transform.scale(img, (32 * 3, 32 * 3))
             self.imgs_corredor.append(img)
 
@@ -25,6 +26,7 @@ class SeekingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.rect.y = randrange(500, 650, 62)
         self.rect.x = randrange(-1500, 500, 88)
+        self.map = map
 
     def update(self):
         if self.index_lista > 6:
@@ -33,7 +35,7 @@ class SeekingEnemy(pg.sprite.Sprite):
         self.index_lista += 0.22
         self.image = self.imgs_corredor[int(self.index_lista)]
 
-        if self.rect.x > sprites.map.rect.width:
+        if self.rect.x > self.map.rect.width:
             self.rect.x = -100
             self.rect.y = randrange(500, 650, 62)
 
@@ -45,18 +47,17 @@ class SeekingEnemy(pg.sprite.Sprite):
                 self.kill()
                 syringe.kill()
 
-
 class ShootingEnemy(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, map: Map):
         pg.sprite.Sprite.__init__(self)
-        self.image = enemy_sprite_sheet2.convert_alpha()
+        self.image = shooting_enemy_sprite_sheet.convert_alpha()
         self.imgs_cuspidor = []
         for i in range(16):
-            img = enemy_sprite_sheet2.subsurface((i * 32, 0), (32, 32))
+            img = shooting_enemy_sprite_sheet.subsurface((i * 32, 0), (32, 32))
             img = pg.transform.scale(img, (32 * 3, 32 * 3))
             self.imgs_cuspidor.append(img)
 
-        self.shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
+        self.shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
         self.index_lista = 0
         self.image = self.imgs_cuspidor[self.index_lista]
         self.rect = self.image.get_rect()
@@ -67,6 +68,7 @@ class ShootingEnemy(pg.sprite.Sprite):
         self.shot_speed = 5
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
+        self.map = map
 
     def update(self):
         if self.index_lista > 15:
@@ -89,12 +91,12 @@ class ShootingEnemy(pg.sprite.Sprite):
         current_shot = pg.time.get_ticks()
         if current_shot - self.last_shot >= self.shot_cooldown:
             self.last_shot = current_shot
-            shot = Shot(self.shot_image, self.rect.x + self.rect.width - 30, self.rect.y + 30, shot_speed, horizontal_velocity, vertical_velocity, 0)
+            shot = Shot(self.shot_image, self.rect.x + self.rect.width - 30, self.rect.y + 30, shot_speed, horizontal_velocity, vertical_velocity, 0, self.map)
             sprites.all_enemy_shots.add(shot)
             sprites.all_sprites.add(shot)
 
 class FlyingEnemy(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, map: Map):
         pg.sprite.Sprite.__init__(self)
         self.image = enemy_sprite_sheet3.convert_alpha()
         self.imgs_baiacu = []
@@ -111,6 +113,7 @@ class FlyingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.rect.y = randrange(-1800, -400, 300)
         self.rect.x = randrange(750, 1000, 80)
+        self.map = map
 
     def update(self):
         if self.index_lista > 62:
@@ -119,7 +122,7 @@ class FlyingEnemy(pg.sprite.Sprite):
         self.index_lista += 0.7
         self.image = self.imgs_baiacu[int(self.index_lista)]
 
-        if self.rect.y > sprites.map.rect.height:
+        if self.rect.y > self.map.rect.height:
             self.rect.x = randrange(750, 1000, 80)
             self.rect.y = randrange(-1800, -400, 380)
 
