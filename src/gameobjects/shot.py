@@ -21,6 +21,6 @@ class Shot(pg.sprite.Sprite):
         
         if (self.rect.x + self.rect.width < 0 or
             self.rect.x > self.map.rect.width or
-            self.rect.y + self.rect.height < 0 or
+            self.rect.bottom + self.rect.height < 0 or
             self.rect.y > self.map.rect.height):
             self.kill()

@@ -1,4 +1,4 @@
-import pygame as pg, globals, colors, sprites, testing
+import pygame as pg, os, paths, globals, colors, sprites, testing
 from gameobjects.camera import Camera
 from gameobjects.map import Map
 from gameobjects.player import Player
@@ -6,7 +6,7 @@ from gameobjects.enemy import SeekingEnemy, ShootingEnemy, FlyingEnemy
 from gameobjects.text import Text
 
 def level1():    
-    map = Map()
+    map = Map(os.path.join(paths.maps_folder, 'map1.tmx'))
     sprites.all_sprites.add(map)
    
     camera = Camera(map.rect.width, map.rect.height)
@@ -54,8 +54,6 @@ def level1():
                     sprites.show_image_boxes = not sprites.show_image_boxes
                 elif event.key == pg.K_F3:
                     sprites.show_hitboxes = not sprites.show_hitboxes
-
-        globals.screen.fill(colors.BLACK)
 
         sprites.all_sprites.update()
         sprites.all_fixed_sprites.update()
