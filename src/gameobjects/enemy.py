@@ -5,7 +5,8 @@ from gameobjects.shot import Shot
 
 seeking_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'seeking-enemy.png'))
 shooting_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'shooting-enemy.png'))
-enemy_sprite_sheet3 = pg.image.load(os.path.join(paths.enemies_folder, 'bicho3.png'))
+flying_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'flying-enemy.png'))
+dissipating_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'dissipating-enemy.png'))
 
 
 class SeekingEnemy(pg.sprite.Sprite):
@@ -98,10 +99,10 @@ class ShootingEnemy(pg.sprite.Sprite):
 class FlyingEnemy(pg.sprite.Sprite):
     def __init__(self, map: Map):
         pg.sprite.Sprite.__init__(self)
-        self.image = enemy_sprite_sheet3.convert_alpha()
+        self.image = flying_enemy_sprite_sheet
         self.imgs_baiacu = []
         for i in range(63):
-            img = enemy_sprite_sheet3.subsurface((i * 32, 0), (32, 32))
+            img = flying_enemy_sprite_sheet.subsurface((i * 32, 0), (32, 32))
             img = pg.transform.scale(img, (32 * 2, 32 * 2))
             self.imgs_baiacu.append(img)
 
@@ -127,6 +128,39 @@ class FlyingEnemy(pg.sprite.Sprite):
             self.rect.y = randrange(-1800, -400, 380)
 
         self.rect.y += 4
+        self.hitbox.center = self.rect.center
+
+        for syringe in sprites.all_syringes:
+            if self.hitbox.colliderect(syringe):
+                self.kill()
+                syringe.kill()
+
+class DissipatingEnemy(pg.sprite.Sprite):
+    def __init__(self, map: Map):
+        pg.sprite.Sprite.__init__(self)
+        self.image = dissipating_enemy_sprite_sheet.convert_alpha()
+        self.imgs_dissipador = []
+        for i in range(80):
+            img = dissipating_enemy_sprite_sheet.subsurface((i * 32, 0), (32, 32))
+            img = pg.transform.scale(img, (32 * 4, 32 * 4))
+            self.imgs_dissipador.append(img)
+
+        self.shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
+        self.index_lista = 0
+        self.image = self.imgs_dissipador[self.index_lista]
+        self.rect = self.image.get_rect()
+        self.hitbox = pg.Rect(0, 0, 23 * 4, 23 * 4)
+        self.mask = pg.mask.from_surface(self.image)
+        self.rect.y = 900
+        self.rect.x = 1200
+        self.map = map
+
+    def update(self):
+        if self.index_lista > 79:
+            self.index_lista = 0
+
+        self.index_lista += 0.7
+        self.image = self.imgs_dissipador[int(self.index_lista)]
         self.hitbox.center = self.rect.center
 
         for syringe in sprites.all_syringes:

@@ -2,7 +2,7 @@ import pygame as pg, os, paths, globals, colors, sprites, testing
 from gameobjects.camera import Camera
 from gameobjects.map import Map
 from gameobjects.player import Player
-from gameobjects.enemy import SeekingEnemy, ShootingEnemy, FlyingEnemy
+from gameobjects.enemy import SeekingEnemy, ShootingEnemy, FlyingEnemy, DissipatingEnemy
 from gameobjects.text import Text
 
 def level1():    
@@ -23,6 +23,10 @@ def level1():
     shooter = ShootingEnemy(map)
     sprites.all_enemies.add(shooter)
     sprites.all_sprites.add(shooter)
+
+    dissipater = DissipatingEnemy(map)
+    sprites.all_enemies.add(dissipater)
+    sprites.all_sprites.add(dissipater)
 
     for i in range(15):
         pufferfish = FlyingEnemy(map)
