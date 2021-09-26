@@ -24,9 +24,9 @@ def level1():
     sprites.all_enemies.add(shooter)
     sprites.all_sprites.add(shooter)
 
-    dissipater = DissipatingEnemy(map)
-    sprites.all_enemies.add(dissipater)
-    sprites.all_sprites.add(dissipater)
+    dissipador = DissipatingEnemy(map)
+    sprites.all_enemies.add(dissipador)
+    sprites.all_sprites.add(dissipador)
 
     for i in range(15):
         pufferfish = FlyingEnemy(map)
