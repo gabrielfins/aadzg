@@ -145,7 +145,7 @@ class DissipatingEnemy(pg.sprite.Sprite):
             img = pg.transform.scale(img, (32 * 4, 32 * 4))
             self.imgs_dissipador.append(img)
 
-        self.shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
+        self.shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot2.png')), (180, 50)).convert_alpha()
         self.index_lista = 0
         self.image = self.imgs_dissipador[self.index_lista]
         self.rect = self.image.get_rect()
@@ -153,6 +153,9 @@ class DissipatingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.rect.y = 900
         self.rect.x = 1200
+        self.shot_speed = 10
+        self.shot_cooldown = 1000
+        self.last_shot = pg.time.get_ticks()
         self.map = map
 
     def update(self):
@@ -161,9 +164,22 @@ class DissipatingEnemy(pg.sprite.Sprite):
 
         self.index_lista += 0.7
         self.image = self.imgs_dissipador[int(self.index_lista)]
+
+        if self.index_lista >= 43:
+            self.shoot(self.shot_speed, 0, -1)
+
         self.hitbox.center = self.rect.center
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
                 self.kill()
                 syringe.kill()
+
+    def shoot(self, shot_speed, horizontal_velocity, vertical_velocity):
+        current_shot = pg.time.get_ticks()
+        if current_shot - self.last_shot >= self.shot_cooldown:
+            self.last_shot = current_shot
+            shot = Shot(self.shot_image, self.rect.x + self.rect.width - 62, self.rect.y + 20, shot_speed, horizontal_velocity, vertical_velocity, 0, self.map)
+            sprites.all_enemy_shots.add(shot)
+            sprites.all_sprites.add(shot)
+
