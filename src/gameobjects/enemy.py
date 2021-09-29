@@ -1,18 +1,21 @@
-import pygame as pg, os, paths, sprites
+import pygame as pg, os, paths, sprites, math
 from random import randrange
+from gameobjects.player import Player
 from gameobjects.map import Map
 from gameobjects.shot import Shot
 
-seeking_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'seeking-enemy.png'))
-shooting_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'shooting-enemy.png'))
-flying_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'flying-enemy.png'))
-dissipating_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'dissipating-enemy.png'))
+seeking_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'seeking-enemy.png')).convert_alpha()
+shooting_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'shooting-enemy.png')).convert_alpha()
+flying_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'flying-enemy.png')).convert_alpha()
+dissipating_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'dissipating-enemy.png')).convert_alpha()
+shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
 
+possible_angles = [0, 45, 90, 135, 180, -45, -90, -135, -180]
 
 class SeekingEnemy(pg.sprite.Sprite):
     def __init__(self, map: Map):
         pg.sprite.Sprite.__init__(self)
-        self.image = seeking_enemy_sprite_sheet.convert_alpha()
+        self.image = seeking_enemy_sprite_sheet
         self.imgs_corredor = []
         for i in range(7):
             img = seeking_enemy_sprite_sheet.subsurface((i * 32, 0), (32, 32))
@@ -49,16 +52,15 @@ class SeekingEnemy(pg.sprite.Sprite):
                 syringe.kill()
 
 class ShootingEnemy(pg.sprite.Sprite):
-    def __init__(self, map: Map):
+    def __init__(self, player: Player, map: Map):
         pg.sprite.Sprite.__init__(self)
-        self.image = shooting_enemy_sprite_sheet.convert_alpha()
+        self.image = shooting_enemy_sprite_sheet
         self.imgs_cuspidor = []
         for i in range(16):
             img = shooting_enemy_sprite_sheet.subsurface((i * 32, 0), (32, 32))
             img = pg.transform.scale(img, (32 * 3, 32 * 3))
             self.imgs_cuspidor.append(img)
 
-        self.shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
         self.index_lista = 0
         self.image = self.imgs_cuspidor[self.index_lista]
         self.rect = self.image.get_rect()
@@ -69,6 +71,7 @@ class ShootingEnemy(pg.sprite.Sprite):
         self.shot_speed = 5
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
+        self.player = player
         self.map = map
 
     def update(self):
@@ -79,7 +82,12 @@ class ShootingEnemy(pg.sprite.Sprite):
         self.image = self.imgs_cuspidor[int(self.index_lista)]
         
         if self.index_lista >= 11:
-            self.shoot(self.shot_speed, 1, 0)
+            x = self.hitbox.centerx + 15
+            y = self.hitbox.centery - 20
+            dx = self.player.hitbox.centerx - x
+            dy = self.player.hitbox.centery - y
+            deg = math.degrees(math.atan2(-dy, dx))
+            self.shoot(deg)
 
         self.hitbox.center = self.rect.center
 
@@ -88,11 +96,11 @@ class ShootingEnemy(pg.sprite.Sprite):
                 self.kill()
                 syringe.kill()
 
-    def shoot(self, shot_speed, horizontal_velocity, vertical_velocity):
+    def shoot(self, angle):
         current_shot = pg.time.get_ticks()
         if current_shot - self.last_shot >= self.shot_cooldown:
             self.last_shot = current_shot
-            shot = Shot(self.shot_image, self.rect.x + self.rect.width - 30, self.rect.y + 30, shot_speed, horizontal_velocity, vertical_velocity, 0, self.map)
+            shot = Shot(shot_image, self.hitbox.center, 15, -20, self.shot_speed, angle, self.map)
             sprites.all_enemy_shots.add(shot)
             sprites.all_sprites.add(shot)
 
@@ -136,16 +144,15 @@ class FlyingEnemy(pg.sprite.Sprite):
                 syringe.kill()
 
 class DissipatingEnemy(pg.sprite.Sprite):
-    def __init__(self, map: Map):
+    def __init__(self, player: Player, map: Map):
         pg.sprite.Sprite.__init__(self)
-        self.image = dissipating_enemy_sprite_sheet.convert_alpha()
+        self.image = dissipating_enemy_sprite_sheet
         self.imgs_dissipador = []
         for i in range(80):
             img = dissipating_enemy_sprite_sheet.subsurface((i * 32, 0), (32, 32))
             img = pg.transform.scale(img, (32 * 4, 32 * 4))
             self.imgs_dissipador.append(img)
 
-        self.shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot2.png')), (180, 50)).convert_alpha()
         self.index_lista = 0
         self.image = self.imgs_dissipador[self.index_lista]
         self.rect = self.image.get_rect()
@@ -153,9 +160,10 @@ class DissipatingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.rect.y = 900
         self.rect.x = 1200
-        self.shot_speed = 10
+        self.shot_speed = 5
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
+        self.player = player
         self.map = map
 
     def update(self):
@@ -166,7 +174,12 @@ class DissipatingEnemy(pg.sprite.Sprite):
         self.image = self.imgs_dissipador[int(self.index_lista)]
 
         if self.index_lista >= 43:
-            self.shoot(self.shot_speed, 0, -1)
+            x = self.hitbox.centerx
+            y = self.hitbox.centery
+            dx = self.player.hitbox.centerx - x
+            dy = self.player.hitbox.centery - y
+            deg = math.degrees(math.atan2(-dy, dx))
+            self.shoot(deg)
 
         self.hitbox.center = self.rect.center
 
@@ -175,11 +188,11 @@ class DissipatingEnemy(pg.sprite.Sprite):
                 self.kill()
                 syringe.kill()
 
-    def shoot(self, shot_speed, horizontal_velocity, vertical_velocity):
+    def shoot(self, angle):
         current_shot = pg.time.get_ticks()
         if current_shot - self.last_shot >= self.shot_cooldown:
-            self.last_shot = current_shot
-            shot = Shot(self.shot_image, self.rect.x + self.rect.width - 62, self.rect.y + 20, shot_speed, horizontal_velocity, vertical_velocity, 0, self.map)
-            sprites.all_enemy_shots.add(shot)
-            sprites.all_sprites.add(shot)
-
+            for i in range(-1, 2):
+                self.last_shot = current_shot
+                shot = Shot(shot_image, self.hitbox.center, 0, 0, self.shot_speed, min((possible_angles), key=lambda i:abs(i-angle)) + i * 20, self.map)
+                sprites.all_enemy_shots.add(shot)
+                sprites.all_sprites.add(shot)

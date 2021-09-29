@@ -16,15 +16,18 @@ def level1():
 
     all_collidable_groups = [player, sprites.all_syringes, sprites.all_enemies, sprites.all_enemy_shots, sprites.all_powerups]
 
-    saved = 0
-    text = Text(f'salvos: {saved}', 32, colors.WHITE, globals.screen_rect.width - 20, 20, 'right')
-    sprites.all_fixed_sprites.add(text)
+    lives_text = Text(str(player.lives), 32, colors.WHITE, 20, 20, player.lives)
+    sprites.all_fixed_sprites.add(lives_text)
 
-    shooter = ShootingEnemy(map)
+    saved = 0
+    saved_text = Text(f'salvos: {saved}', 32, colors.WHITE, globals.screen_rect.width - 20, 20, saved, 'right')
+    sprites.all_fixed_sprites.add(saved_text)
+
+    shooter = ShootingEnemy(player, map)
     sprites.all_enemies.add(shooter)
     sprites.all_sprites.add(shooter)
 
-    dissipador = DissipatingEnemy(map)
+    dissipador = DissipatingEnemy(player, map)
     sprites.all_enemies.add(dissipador)
     sprites.all_sprites.add(dissipador)
 
@@ -60,6 +63,8 @@ def level1():
                     sprites.show_hitboxes = not sprites.show_hitboxes
 
         sprites.all_sprites.update()
+        lives_text.text = str(player.lives)
+        saved_text.text = str(f'salvos: {saved}')
         sprites.all_fixed_sprites.update()
         camera.update(player)
     
