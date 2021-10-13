@@ -18,7 +18,6 @@ class Shot(pg.sprite.Sprite):
     def update(self):
         self.rect.move_ip(self.speed * math.cos(self.rads), self.speed * -math.sin(self.rads))
         self.hitbox = self.rect
-        print(self.rads)
         
         if not self.map.rect.contains(self.hitbox):
             self.kill()

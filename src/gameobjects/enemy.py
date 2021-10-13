@@ -3,14 +3,31 @@ from random import randrange
 from gameobjects.player import Player
 from gameobjects.map import Map
 from gameobjects.shot import Shot
+from gameobjects.powerup import Coffee, Mask
 
 seeking_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'seeking-enemy.png')).convert_alpha()
 shooting_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'shooting-enemy.png')).convert_alpha()
 flying_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'flying-enemy.png')).convert_alpha()
 dissipating_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'dissipating-enemy.png')).convert_alpha()
-shot_image = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
+shot_sprite = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
 
 possible_angles = [0, 45, 90, 135, 180, -45, -90, -135, -180]
+powerup_chance = 2
+
+def die(enemy):
+    i = randrange(0, powerup_chance)
+    if i == 1:
+        j = randrange(0, 3)
+        if j == 1:
+            powerup = Coffee(enemy.hitbox.centerx, enemy.hitbox.centery)
+            sprites.all_powerups.add(powerup)
+            sprites.all_sprites.add(powerup)
+        elif j == 2:
+            powerup = Mask(enemy.hitbox.centerx, enemy.hitbox.centery)
+            sprites.all_powerups.add(powerup)
+            sprites.all_sprites.add(powerup)
+    
+    enemy.kill()
 
 class SeekingEnemy(pg.sprite.Sprite):
     def __init__(self, map: Map):
@@ -48,8 +65,9 @@ class SeekingEnemy(pg.sprite.Sprite):
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
-                self.kill()
+                die(self)
                 syringe.kill()
+
 
 class ShootingEnemy(pg.sprite.Sprite):
     def __init__(self, player: Player, map: Map):
@@ -93,16 +111,17 @@ class ShootingEnemy(pg.sprite.Sprite):
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
-                self.kill()
+                die(self)
                 syringe.kill()
 
     def shoot(self, angle):
         current_shot = pg.time.get_ticks()
         if current_shot - self.last_shot >= self.shot_cooldown:
             self.last_shot = current_shot
-            shot = Shot(shot_image, self.hitbox.center, 15, -20, self.shot_speed, angle, self.map)
+            shot = Shot(shot_sprite, self.hitbox.center, 15, -20, self.shot_speed, angle, self.map)
             sprites.all_enemy_shots.add(shot)
             sprites.all_sprites.add(shot)
+
 
 class FlyingEnemy(pg.sprite.Sprite):
     def __init__(self, map: Map):
@@ -140,8 +159,9 @@ class FlyingEnemy(pg.sprite.Sprite):
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
-                self.kill()
+                die(self)
                 syringe.kill()
+
 
 class DissipatingEnemy(pg.sprite.Sprite):
     def __init__(self, player: Player, map: Map):
@@ -185,7 +205,7 @@ class DissipatingEnemy(pg.sprite.Sprite):
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
-                self.kill()
+                die(self)
                 syringe.kill()
 
     def shoot(self, angle):
@@ -193,6 +213,6 @@ class DissipatingEnemy(pg.sprite.Sprite):
         if current_shot - self.last_shot >= self.shot_cooldown:
             for i in range(-1, 2):
                 self.last_shot = current_shot
-                shot = Shot(shot_image, self.hitbox.center, 0, 0, self.shot_speed, min((possible_angles), key=lambda i:abs(i-angle)) + i * 20, self.map)
+                shot = Shot(shot_sprite, self.hitbox.center, 0, 0, self.shot_speed, min((possible_angles), key=lambda i:abs(i-angle)) + i * 20, self.map)
                 sprites.all_enemy_shots.add(shot)
                 sprites.all_sprites.add(shot)

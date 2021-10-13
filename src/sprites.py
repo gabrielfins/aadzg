@@ -4,6 +4,7 @@ from gameobjects.camera import Camera
 show_hitboxes = False
 show_image_boxes = False
 
+
 class YAwareGroup(pg.sprite.Group):
     def by_y(self, spr):
         return spr.hitbox.y
@@ -30,4 +31,5 @@ all_syringes = pg.sprite.Group()
 all_enemies = pg.sprite.Group()
 all_enemy_shots = pg.sprite.Group()
 all_powerups = pg.sprite.Group()
+all_obstacles = pg.sprite.Group()
 all_fixed_sprites = pg.sprite.Group()

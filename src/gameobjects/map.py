@@ -1,4 +1,5 @@
-import pygame as pg, pytmx
+import pygame as pg, pytmx, sprites
+from gameobjects.obstacle import Obstacle
 
 
 class Map(pg.sprite.Sprite):
@@ -15,7 +16,7 @@ class Map(pg.sprite.Sprite):
     def render(self, surface):
         ti = self.tmxdata.get_tile_image_by_gid
         for layer in self.tmxdata.visible_layers:
-            if isinstance(layer, pytmx.TiledTileLayer): 
+            if isinstance(layer, pytmx.TiledTileLayer):
                 for x, y, gid in layer:
                     tile = ti(gid)
                     if tile:
