@@ -6,6 +6,8 @@ from gameobjects.powerup import Mask, Powerup, Coffee
 player_sprite_sheet = pg.image.load(os.path.join(paths.player_folder, 'player.png')).convert_alpha()
 shot_sprite = pg.image.load(os.path.join(paths.player_folder, 'syringe.png')).convert_alpha()
 
+all_lives = pg.sprite.Group()
+
 
 class Player(pg.sprite.Sprite):
     def __init__(self, map: Map):
@@ -17,6 +19,7 @@ class Player(pg.sprite.Sprite):
                 img = pg.transform.scale(player_sprite_sheet.subsurface((25 * i, 48 * j), (25, 48)), (50, 96))
                 sprites.append(img)
             self.animation_sprites.append(sprites)
+            
         self.animation_step = 0
         self.direction = 0
         self.image = pg.transform.scale(player_sprite_sheet.subsurface((0, 48 * self.direction), (25, 48)), (50, 96))
@@ -33,12 +36,12 @@ class Player(pg.sprite.Sprite):
         self.lives = 3
         self.iframes = 2500
         self.last_hit = pg.time.get_ticks()
-        self.powerup_cooldown = 0
-        self.powerup_duration = 10000
+        self.powerup_duration = 0
         self.powerup_speed = 0
         self.last_powerup_tick = 0
         self.is_dead = False
         self.is_invincible = False
+        
 
     def update(self):
         '''
@@ -178,14 +181,12 @@ class Player(pg.sprite.Sprite):
 
     def tick_powerup(self):
         current_powerup_tick = pg.time.get_ticks()
-        if self.powerup_cooldown != 0:
-            if current_powerup_tick - self.last_powerup_tick >= self.powerup_duration:
-                self.powerup_cooldown = 0
-                self.reset_powerups()
+        if current_powerup_tick - self.last_powerup_tick >= self.powerup_duration:
+            self.powerup_duration = 0
+            self.reset_powerups()
 
     def set_active_powerup(self, powerup: Powerup):
         self.powerup_duration = powerup.duration
-        self.powerup_cooldown = powerup.duration
         self.last_powerup_tick = pg.time.get_ticks()
         powerup.kill()
 

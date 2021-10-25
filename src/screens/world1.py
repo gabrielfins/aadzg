@@ -5,6 +5,7 @@ from gameobjects.player import Player
 from gameobjects.enemy import SeekingEnemy, ShootingEnemy, FlyingEnemy, DissipatingEnemy
 from gameobjects.text import Text
 from gameobjects.obstacle import Obstacle
+from gameobjects.life import Life
 
 def level1():
     map = Map(os.path.join(paths.maps_folder, 'map1.tmx'))
@@ -27,8 +28,13 @@ def level1():
                              sprites.all_powerups,
                              sprites.all_obstacles]
 
-    lives_text = Text(str(player.lives), 32, colors.WHITE, 20, 20)
-    sprites.all_fixed_sprites.add(lives_text)
+    all_lives = []
+    all_empty_lives = []
+
+    for i in range(player.lives):
+        life = Life(30 * i + 10, 10)
+        all_lives.append(life)
+        sprites.all_fixed_sprites.add(life)
 
     saved = 0
     saved_text = Text(f'Salvos: {saved}', 32, colors.WHITE, globals.screen_rect.width - 20, 20, 'right')
@@ -69,15 +75,21 @@ def level1():
                     sprites.show_hitboxes = not sprites.show_hitboxes
 
         sprites.all_sprites.update()
-        lives_text.text = str(player.lives)
         saved_text.text = str(f'Salvos: {saved}')
         sprites.all_fixed_sprites.update()
         camera.update(player)
 
+        if len(all_lives) != player.lives:
+            sprites.all_fixed_sprites.remove(all_lives[player.lives])
+            if player.lives != 3:
+                life = Life(all_lives[player.lives].rect.x, all_lives[player.lives].rect.y, 'empty')
+                all_empty_lives.append(life)
+                sprites.all_fixed_sprites.add(life)
+
         if player.is_dead:
             running = False
             empty_sprite_groups()
-    
+
         sprites.all_sprites.draw(globals.screen, camera)
         sprites.all_fixed_sprites.draw(globals.screen)
         testing.draw(all_collidable_groups, camera)

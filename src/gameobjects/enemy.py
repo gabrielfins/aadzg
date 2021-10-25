@@ -3,7 +3,7 @@ from random import randrange
 from gameobjects.player import Player
 from gameobjects.map import Map
 from gameobjects.shot import Shot
-from gameobjects.powerup import Coffee, Mask
+from gameobjects.powerup import Coffee, Mask, Powerup
 
 seeking_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'seeking-enemy.png')).convert_alpha()
 shooting_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'shooting-enemy.png')).convert_alpha()
@@ -15,9 +15,9 @@ possible_angles = [0, 45, 90, 135, 180, -45, -90, -135, -180]
 powerup_chance = 2
 
 def die(enemy):
-    i = randrange(0, powerup_chance)
+    i = randrange(1, powerup_chance)
     if i == 1:
-        j = randrange(0, 3)
+        j = randrange(1, 3)
         if j == 1:
             powerup = Coffee(enemy.hitbox.centerx, enemy.hitbox.centery)
             sprites.all_powerups.add(powerup)

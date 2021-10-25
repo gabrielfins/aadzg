@@ -27,4 +27,3 @@ class Mask(Powerup):
         super().__init__(x, y)
         self.image = mask_sprite
         self.duration = 5000
-
