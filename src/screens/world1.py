@@ -1,4 +1,4 @@
-import pygame as pg, os, paths, globals, colors, sprites, testing
+import pygame as pg, os, paths, globals, colors, sprites, testing, screens.pause, screens.game_over
 from gameobjects.camera import Camera
 from gameobjects.map import Map
 from gameobjects.player import Player
@@ -67,8 +67,9 @@ def level1():
                 exit()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    running = False
-                    empty_sprite_groups()
+                    running = screens.pause.pause()
+                    if running == False:
+                        empty_sprite_groups()
                 elif event.key == pg.K_F2:
                     sprites.show_image_boxes = not sprites.show_image_boxes
                 elif event.key == pg.K_F3:
@@ -87,8 +88,9 @@ def level1():
                 sprites.all_fixed_sprites.add(life)
 
         if player.is_dead:
-            running = False
+            screens.game_over.game_over()
             empty_sprite_groups()
+            running = False
 
         sprites.all_sprites.draw(globals.screen, camera)
         sprites.all_fixed_sprites.draw(globals.screen)
