@@ -9,6 +9,7 @@ seeking_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 's
 shooting_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'shooting-enemy.png')).convert_alpha()
 flying_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'flying-enemy.png')).convert_alpha()
 dissipating_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'dissipating-enemy.png')).convert_alpha()
+stumbling_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'stumbling-enemy.png')).convert_alpha()
 shot_sprite = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
 
 possible_angles = [0, 45, 90, 135, 180, -45, -90, -135, -180]
@@ -216,3 +217,42 @@ class DissipatingEnemy(pg.sprite.Sprite):
                 shot = Shot(shot_sprite, self.hitbox.center, 0, 0, self.shot_speed, min((possible_angles), key=lambda i:abs(i-angle)) + i * 20, self.map)
                 sprites.all_enemy_shots.add(shot)
                 sprites.all_sprites.add(shot)
+
+class StumblingEnemy(pg.sprite.Sprite):
+    def __init__(self, map: Map):
+        pg.sprite.Sprite.__init__(self)
+        self.image = stumbling_enemy_sprite_sheet
+        self.imgs_tropego = []
+        for i in range(11):
+            img = stumbling_enemy_sprite_sheet.subsurface((i * 32, 0), (32, 32))
+            img = pg.transform.scale(img, (32 * 6, 32 * 6))
+            self.imgs_tropego.append(img)
+
+        self.index_lista = 0
+        self.image = self.imgs_tropego[self.index_lista]
+        self.rect = self.image.get_rect()
+        self.hitbox = pg.Rect(0, 0, 17 * 7, 17 * 7)
+        self.hitbox.center = self.rect.center
+        self.mask = pg.mask.from_surface(self.image)
+        self.rect.y = randrange(750, 900, 250)
+        self.rect.x = randrange(-700, 100, 300)
+        self.map = map
+
+    def update(self):
+        if self.index_lista > 10:
+            self.index_lista = 0
+
+        self.index_lista += 0.18
+        self.image = self.imgs_tropego[int(self.index_lista)]
+
+        if self.rect.x > self.map.rect.width:
+            self.rect.x = -300
+            self.rect.y = randrange(640, 1050, 200)
+
+        self.rect.x += 1
+        self.hitbox.center = self.rect.center
+
+        for syringe in sprites.all_syringes:
+            if self.hitbox.colliderect(syringe):
+                die(self)
+                syringe.kill()
