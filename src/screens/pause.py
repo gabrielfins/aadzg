@@ -6,6 +6,10 @@ def pause():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 
+    background = pg.Surface((globals.WIDTH, globals.HEIGHT), pg.SRCALPHA)
+    background.fill((0, 0, 0, 200))
+    globals.screen.blit(background, (0, 0))
+
     title = Text('Pause', 48, colors.WHITE, globals.screen_rect.width / 2, 100, 'center', 'center')
     all_sprites.add(title)
     
@@ -24,6 +28,10 @@ def pause():
                 running = False
                 pg.quit()
                 sys.exit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    running = False
+                    return True
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
                     if resume_button.rect.collidepoint(pg.mouse.get_pos()):
@@ -32,8 +40,6 @@ def pause():
                     elif exit_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
                         return False
-
-        globals.screen.fill(colors.BLACK)
 
         for button in all_buttons:
             if button.rect.collidepoint(pg.mouse.get_pos()):

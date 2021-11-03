@@ -131,9 +131,7 @@ def world2_select():
                 sys.exit()
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
-                    if world1_button.rect.collidepoint(pg.mouse.get_pos()):
-                        screens.world1.level1()
-                    elif back_button.rect.collidepoint(pg.mouse.get_pos()):
+                    if back_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
 
         globals.screen.fill(colors.BLACK)

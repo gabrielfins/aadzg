@@ -92,14 +92,14 @@ def level1():
                 all_empty_lives.append(life)
                 sprites.all_fixed_sprites.add(life)
 
+        sprites.all_sprites.draw(globals.screen, camera)
+        sprites.all_fixed_sprites.draw(globals.screen)
+        testing.draw(all_collidable_groups, camera)
+
         if player.is_dead:
             screens.game_over.game_over()
             empty_sprite_groups()
             running = False
-
-        sprites.all_sprites.draw(globals.screen, camera)
-        sprites.all_fixed_sprites.draw(globals.screen)
-        testing.draw(all_collidable_groups, camera)
 
         pg.display.update()
         globals.clock.tick(globals.FPS)

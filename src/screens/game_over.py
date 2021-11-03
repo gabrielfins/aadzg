@@ -6,6 +6,10 @@ def game_over():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 
+    background = pg.Surface((globals.WIDTH, globals.HEIGHT), pg.SRCALPHA)
+    background.fill((0, 0, 0, 200))
+    globals.screen.blit(background, (0, 0))
+
     title = Text('Fim de Jogo', 48, colors.WHITE, globals.screen_rect.width / 2, 100, 'center', 'center')
     all_sprites.add(title)
     
@@ -24,8 +28,6 @@ def game_over():
                 if event.button == 1:
                     if exit_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
-
-        globals.screen.fill(colors.BLACK)
 
         for button in all_buttons:
             if button.rect.collidepoint(pg.mouse.get_pos()):

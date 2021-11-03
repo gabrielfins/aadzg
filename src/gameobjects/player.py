@@ -47,18 +47,18 @@ class Player(pg.sprite.Sprite):
         self.image = self.animation_sprites[int(self.animation_step if self.animation_step <= 3 else 3)][self.direction]
 
         key = pg.key.get_pressed()
-        self.move(key)
         self.shoot(key)
+        self.move(key)
         self.collide_with_entities()
         self.tick_powerup()
 
         if self.lives == 0:
             self.is_dead = True
+            self.kill()
 
     def move(self, key):
         dx = 0
         dy = 0
-        is_moving = False
 
         if key[pg.K_w] or key[pg.K_s] and key[pg.K_a] or key[pg.K_d]:
             self.speed = round(self.original_speed * math.sqrt(2) / 2) + self.powerup_speed
@@ -73,7 +73,6 @@ class Player(pg.sprite.Sprite):
             self.animation_step += .08
         else:
             self.animation_step = 0
-
 
         if key[pg.K_w]:
             dy = -self.speed
