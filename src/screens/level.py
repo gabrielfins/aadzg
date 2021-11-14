@@ -46,12 +46,13 @@ def level(map_path):
     sprites.all_fixed_sprites.add(saved_text)
 
     wave = 0
+    wave_indicator = 0
     spawned_enemies = 0
     clock = pg.time.Clock()
     dt = 0
     timer = 11000
 
-    wave_text = Text(f'Rodada {wave}', 32, colors.WHITE, globals.screen_rect.width / 2, 20, 'center')
+    wave_text = Text(f'Rodada {wave_indicator}', 32, colors.WHITE, globals.screen_rect.width / 2, 20, 'center')
     sprites.all_fixed_sprites.add(wave_text)
 
     time_to_wave_text = Text(f'{int(timer / 1000 if timer >= 0 else 0)}', 24, colors.WHITE, globals.screen_rect.width / 2, 50, 'center')
@@ -78,7 +79,7 @@ def level(map_path):
 
         sprites.all_sprites.update()
         saved_text.text = f'Salvos: {sprites.saved}'
-        wave_text.text = f'Rodada {wave}'
+        wave_text.text = f'Rodada {wave_indicator}'
         time_to_wave_text.text = f'{int(timer / 1000 if timer >= 0 else 0)}'
         sprites.all_fixed_sprites.update()
         camera.update(player)
@@ -94,6 +95,7 @@ def level(map_path):
 
         timer -= dt
         if timer <= 0:
+            wave_indicator = wave + 1
             if wave == 0:
                 for i in range(0, 6, 1):
                     current_time = pg.time.get_ticks()
@@ -175,7 +177,6 @@ def level(map_path):
                         wave_tick = current_time
                         spawned_enemies += 1
                 if spawned_enemies >= 40:
-                    wave += 1
                     spawned_enemies = 0
 
 
@@ -191,7 +192,7 @@ def level(map_path):
             empty_sprite_groups()
             running = False
 
-        if wave == 4 and len(sprites.all_enemies) == 0:
+        if wave == 4 and len(sprites.all_enemies) == 0 and spawned_enemies == 0:
             screens.game_win.game_win()
             empty_sprite_groups()
             running = False
