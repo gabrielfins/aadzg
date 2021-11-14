@@ -1,4 +1,4 @@
-import pygame as pg, globals, sprites, colors, screens.world1, sys
+import pygame as pg, globals, sprites, colors, screens.level, sys, os, paths
 from gameobjects.text import Text
 from gameobjects.button import Button
 
@@ -32,9 +32,9 @@ def world_select():
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
                     if world1_button.rect.collidepoint(pg.mouse.get_pos()):
-                        world1_select()
+                        world1_levels_select()
                     elif world2_button.rect.collidepoint(pg.mouse.get_pos()):
-                        world2_select()
+                        world2_levels_select()
                     elif back_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
 
@@ -54,7 +54,7 @@ def world_select():
         pg.display.update()
         globals.clock.tick(globals.FPS)
 
-def world1_select():
+def world1_levels_select():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 
@@ -83,7 +83,9 @@ def world1_select():
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
                     if world1_button.rect.collidepoint(pg.mouse.get_pos()):
-                        screens.world1.level1()
+                        screens.level.level(os.path.join(paths.maps_folder, 'map1.tmx'))
+                    elif world2_button.rect.collidepoint(pg.mouse.get_pos()):
+                        screens.level.level(os.path.join(paths.maps_folder, 'map2.tmx'))
                     elif back_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
 
@@ -103,7 +105,7 @@ def world1_select():
         pg.display.update()
         globals.clock.tick(globals.FPS)
 
-def world2_select():
+def world2_levels_select():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 

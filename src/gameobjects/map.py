@@ -1,5 +1,4 @@
-import pygame as pg, pytmx, sprites
-from gameobjects.obstacle import Obstacle
+import pygame as pg, pytmx
 
 
 class Map(pg.sprite.Sprite):

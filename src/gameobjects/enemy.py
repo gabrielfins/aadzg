@@ -1,9 +1,9 @@
 import pygame as pg, os, paths, sprites, math
-from random import randrange
+from random import random, randrange
 from gameobjects.player import Player
 from gameobjects.map import Map
 from gameobjects.shot import Shot
-from gameobjects.powerup import Coffee, Mask, Powerup
+from gameobjects.powerup import Coffee, Mask, Heart
 
 seeking_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'seeking-enemy.png')).convert_alpha()
 shooting_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'shooting-enemy.png')).convert_alpha()
@@ -13,25 +13,11 @@ stumbling_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 
 shot_sprite = pg.transform.scale(pg.image.load(os.path.join(paths.enemies_folder, 'enemy-shot.png')), (24, 24)).convert_alpha()
 
 possible_angles = [0, 45, 90, 135, 180, -45, -90, -135, -180]
-powerup_chance = 2
+powerup_chance = 6
 
-def die(enemy):
-    i = randrange(1, powerup_chance)
-    if i == 1:
-        j = randrange(1, 3)
-        if j == 1:
-            powerup = Coffee(enemy.hitbox.centerx, enemy.hitbox.centery)
-            sprites.all_powerups.add(powerup)
-            sprites.all_sprites.add(powerup)
-        elif j == 2:
-            powerup = Mask(enemy.hitbox.centerx, enemy.hitbox.centery)
-            sprites.all_powerups.add(powerup)
-            sprites.all_sprites.add(powerup)
-    
-    enemy.kill()
 
 class SeekingEnemy(pg.sprite.Sprite):
-    def __init__(self, map: Map):
+    def __init__(self, player: Player, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = seeking_enemy_sprite_sheet
         self.imgs_corredor = []
@@ -46,9 +32,12 @@ class SeekingEnemy(pg.sprite.Sprite):
         self.hitbox = pg.Rect(0, 0, 17 * 3, 17 * 3)
         self.hitbox.center = self.rect.center
         self.mask = pg.mask.from_surface(self.image)
-        self.rect.y = randrange(500, 650, 62)
-        self.rect.x = randrange(-1500, 500, 88)
-        self.map = map
+        self.acc = pg.Vector2(0, 0)
+        self.rect.center = (x, y)
+        self.player = player
+        self.original_speed = 3
+        self.speed = self.original_speed
+        self.direction = 'right'
 
     def update(self):
         if self.index_lista > 6:
@@ -57,21 +46,47 @@ class SeekingEnemy(pg.sprite.Sprite):
         self.index_lista += 0.22
         self.image = self.imgs_corredor[int(self.index_lista)]
 
-        if self.rect.x > self.map.rect.width:
-            self.rect.x = -100
-            self.rect.y = randrange(500, 650, 62)
+        self.move()
 
-        self.rect.x += 1
+        self.rect.move_ip(self.speed * self.acc.x, self.speed * self.acc.y)
         self.hitbox.center = self.rect.center
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
-                die(self)
+                get_saved(self)
                 syringe.kill()
+
+    def move(self):
+        dx = int(round(self.hitbox.centerx - self.player.hitbox.centerx))
+        dy = int(round(self.hitbox.bottom - self.player.hitbox.bottom))
+
+        self.acc.x = 0
+        if dx > 0:
+            self.acc.x = -1
+            self.direction = 'left'
+        elif dx < 0:
+            self.acc.x = 1
+            self.direction = 'right'
+        else:
+            self.direction = 'right'
+
+        self.acc.y = 0
+        if dy > 0:
+            self.acc.y = -1
+        elif dy < 0:
+            self.acc.y = 1
+
+        if dx != 0 and dy != 0:
+            self.speed = int(round(self.original_speed * math.sqrt(2) / 2))
+        else:
+            self.speed = self.original_speed
+
+        if self.direction == 'left':
+            self.image = pg.transform.flip(self.image, True, False)
 
 
 class ShootingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, map: Map):
+    def __init__(self, player: Player, map: Map, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = shooting_enemy_sprite_sheet
         self.imgs_cuspidor = []
@@ -85,8 +100,7 @@ class ShootingEnemy(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.hitbox = pg.Rect(0, 0, 17 * 3, 23 * 3)
         self.mask = pg.mask.from_surface(self.image)
-        self.rect.y = 300
-        self.rect.x = 620
+        self.rect.center = (x, y)
         self.shot_speed = 5
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
@@ -112,7 +126,7 @@ class ShootingEnemy(pg.sprite.Sprite):
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
-                die(self)
+                get_saved(self)
                 syringe.kill()
 
     def shoot(self, angle):
@@ -125,7 +139,7 @@ class ShootingEnemy(pg.sprite.Sprite):
 
 
 class FlyingEnemy(pg.sprite.Sprite):
-    def __init__(self, map: Map):
+    def __init__(self, player: Player, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = flying_enemy_sprite_sheet
         self.imgs_baiacu = []
@@ -140,9 +154,11 @@ class FlyingEnemy(pg.sprite.Sprite):
         self.hitbox = pg.Rect(0, 0, 17 * 3, 17 * 3)
         self.hitbox.center = self.rect.center
         self.mask = pg.mask.from_surface(self.image)
-        self.rect.y = randrange(-1800, -400, 300)
-        self.rect.x = randrange(750, 1000, 80)
-        self.map = map
+        self.acc = pg.Vector2(0, 0)
+        self.rect.center = (x, y)
+        self.player = player
+        self.original_speed = 3
+        self.speed = self.original_speed
 
     def update(self):
         if self.index_lista > 62:
@@ -151,11 +167,9 @@ class FlyingEnemy(pg.sprite.Sprite):
         self.index_lista += 0.7
         self.image = self.imgs_baiacu[int(self.index_lista)]
 
-        if self.rect.y > self.map.rect.height:
-            self.rect.x = randrange(750, 1000, 80)
-            self.rect.y = randrange(-1800, -400, 380)
+        self.move()
 
-        self.rect.y += 4
+        self.rect.move_ip(self.speed * self.acc.x, self.speed * self.acc.y)
         self.hitbox.center = self.rect.center
 
         for syringe in sprites.all_syringes:
@@ -163,9 +177,30 @@ class FlyingEnemy(pg.sprite.Sprite):
                 die(self)
                 syringe.kill()
 
+    def move(self):
+        dx = int(round(self.hitbox.centerx - self.player.hitbox.centerx))
+        dy = int(round(self.hitbox.bottom - self.player.hitbox.bottom))
+
+        self.acc.x = 0
+        if dx > 0:
+            self.acc.x = -1
+        elif dx < 0:
+            self.acc.x = 1
+
+        self.acc.y = 0
+        if dy > 0:
+            self.acc.y = -1
+        elif dy < 0:
+            self.acc.y = 1
+
+        if dx != 0 and dy != 0:
+            self.speed = int(round(self.original_speed * math.sqrt(2) / 2))
+        else:
+            self.speed = self.original_speed
+
 
 class DissipatingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, map: Map):
+    def __init__(self, player: Player, map: Map, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = dissipating_enemy_sprite_sheet
         self.imgs_dissipador = []
@@ -179,8 +214,7 @@ class DissipatingEnemy(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.hitbox = pg.Rect(0, 0, 23 * 4, 23 * 4)
         self.mask = pg.mask.from_surface(self.image)
-        self.rect.y = 900
-        self.rect.x = 1200
+        self.rect.center = (x, y)
         self.shot_speed = 5
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
@@ -206,7 +240,7 @@ class DissipatingEnemy(pg.sprite.Sprite):
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
-                die(self)
+                get_saved(self)
                 syringe.kill()
 
     def shoot(self, angle):
@@ -219,7 +253,7 @@ class DissipatingEnemy(pg.sprite.Sprite):
                 sprites.all_sprites.add(shot)
 
 class StumblingEnemy(pg.sprite.Sprite):
-    def __init__(self, map: Map):
+    def __init__(self, player: Player, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = stumbling_enemy_sprite_sheet
         self.imgs_tropego = []
@@ -234,9 +268,13 @@ class StumblingEnemy(pg.sprite.Sprite):
         self.hitbox = pg.Rect(0, 0, 17 * 7, 17 * 7)
         self.hitbox.center = self.rect.center
         self.mask = pg.mask.from_surface(self.image)
-        self.rect.y = randrange(750, 900, 250)
-        self.rect.x = randrange(-700, 100, 300)
-        self.map = map
+        self.acc = pg.Vector2(0, 0)
+        self.rect.center = (x, y)
+        self.player = player
+        self.original_speed = 2
+        self.speed = self.original_speed
+        self.direction = 'right'
+        self.lives = 3
 
     def update(self):
         if self.index_lista > 10:
@@ -245,14 +283,78 @@ class StumblingEnemy(pg.sprite.Sprite):
         self.index_lista += 0.18
         self.image = self.imgs_tropego[int(self.index_lista)]
 
-        if self.rect.x > self.map.rect.width:
-            self.rect.x = -300
-            self.rect.y = randrange(640, 1050, 200)
+        self.move()
 
-        self.rect.x += 1
+        self.rect.move_ip(self.speed * self.acc.x, self.speed * self.acc.y)
         self.hitbox.center = self.rect.center
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
-                die(self)
+                self.lives -= 1
                 syringe.kill()
+                if self.lives <= 0:
+                    get_saved(self)
+
+    def move(self):
+        dx = int(round(self.hitbox.centerx - self.player.hitbox.centerx))
+        dy = int(round(self.hitbox.bottom - self.player.hitbox.bottom))
+
+        self.acc.x = 0
+        if dx > 0:
+            self.acc.x = -1
+            self.direction = 'left'
+        elif dx < 0:
+            self.acc.x = 1
+            self.direction = 'right'
+        else:
+            self.direction = 'right'
+
+        self.acc.y = 0
+        if dy > 0:
+            self.acc.y = -1
+        elif dy < 0:
+            self.acc.y = 1
+
+        if dx != 0 and dy != 0:
+            self.speed = int(round(self.original_speed * math.sqrt(2) / 2))
+        else:
+            self.speed = self.original_speed
+
+        if self.direction == 'left':
+            self.image = pg.transform.flip(self.image, True, False)
+
+
+def get_saved(enemy):
+    i = randrange(1, powerup_chance)
+    if i == 1:
+        j = randrange(1, 4)
+        if j == 1:
+            powerup = Coffee(enemy.hitbox.centerx, enemy.hitbox.centery)
+            sprites.all_powerups.add(powerup)
+            sprites.all_sprites.add(powerup)
+        elif j == 2:
+            powerup = Mask(enemy.hitbox.centerx, enemy.hitbox.centery)
+            sprites.all_powerups.add(powerup)
+            sprites.all_sprites.add(powerup)
+        elif j == 3:
+            powerup = Heart(enemy.hitbox.centerx, enemy.hitbox.centery)
+            sprites.all_powerups.add(powerup)
+            sprites.all_sprites.add(powerup)
+
+    sprites.saved += 1
+    enemy.kill()
+
+def die(enemy):
+    i = randrange(1, powerup_chance)
+    if i == 1:
+        j = randrange(1, 3)
+        if j == 1:
+            powerup = Coffee(enemy.hitbox.centerx, enemy.hitbox.centery)
+            sprites.all_powerups.add(powerup)
+            sprites.all_sprites.add(powerup)
+        elif j == 2:
+            powerup = Mask(enemy.hitbox.centerx, enemy.hitbox.centery)
+            sprites.all_powerups.add(powerup)
+            sprites.all_sprites.add(powerup)
+    
+    enemy.kill()

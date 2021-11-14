@@ -1,7 +1,7 @@
-import pygame as pg, os, paths, math, sprites
+import pygame as pg, os, paths, math, sprites, globals
 from gameobjects.map import Map
 from gameobjects.shot import Shot
-from gameobjects.powerup import Mask, Powerup, Coffee
+from gameobjects.powerup import Heart, Coffee, FakeCoffee, Mask, FakeMask
 
 player_sprite_sheet = pg.image.load(os.path.join(paths.player_folder, 'player.png')).convert_alpha()
 shot_sprite = pg.image.load(os.path.join(paths.player_folder, 'syringe.png')).convert_alpha()
@@ -41,7 +41,7 @@ class Player(pg.sprite.Sprite):
         self.last_powerup_tick = 0
         self.is_dead = False
         self.is_invincible = False
-        
+        self.active_powerup = None
 
     def update(self):
         self.image = self.animation_sprites[int(self.animation_step if self.animation_step <= 3 else 3)][self.direction]
@@ -59,11 +59,6 @@ class Player(pg.sprite.Sprite):
     def move(self, key):
         dx = 0
         dy = 0
-
-        if key[pg.K_w] or key[pg.K_s] and key[pg.K_a] or key[pg.K_d]:
-            self.speed = round(self.original_speed * math.sqrt(2) / 2) + self.powerup_speed
-        else:
-            self.speed = self.original_speed + self.powerup_speed
 
         if key[pg.K_w] or key[pg.K_s] or key[pg.K_a] or key[pg.K_d]:
             if self.animation_step == 0:
@@ -86,6 +81,11 @@ class Player(pg.sprite.Sprite):
         if key[pg.K_d]:
             dx = self.speed
             self.direction = 2
+
+        if dx != 0 and dy != 0:
+            self.speed = int(round(self.original_speed * math.sqrt(2) / 2) + self.powerup_speed)
+        else:
+            self.speed = self.original_speed + self.powerup_speed
 
         self.rect.move_ip(dx, 0)
 
@@ -155,23 +155,27 @@ class Player(pg.sprite.Sprite):
     def collide_with_entities(self):
         for powerup in sprites.all_powerups:
             if self.hitbox.colliderect(powerup.hitbox):
-                if type(powerup) == Powerup:
+                if type(powerup) == Coffee:
                     self.reset_powerups()
-                    powerup.kill()
-                elif type(powerup) == Coffee:
-                    self.reset_powerups()
-                    self.powerup_speed = 2
+                    self.powerup_speed = 1
                     self.set_active_powerup(powerup)
+                    fake_coffee = FakeCoffee(30, globals.HEIGHT - 30)
+                    sprites.all_fixed_powerups.add(fake_coffee)
                 elif type(powerup) == Mask:
                     self.reset_powerups()
                     self.is_invincible = True
                     self.set_active_powerup(powerup)
+                    fake_mask = FakeMask(30, globals.HEIGHT - 30)
+                    sprites.all_fixed_powerups.add(fake_mask)
+                elif type(powerup) == Heart:
+                    if self.lives < 3:
+                        self.lives += 1
+                        powerup.kill()
 
         if not self.is_invincible:
             for enemy in sprites.all_enemies:
                 if self.hitbox.colliderect(enemy.hitbox):
                     self.get_hit()
-
 
             for enemy_shot in sprites.all_enemy_shots:
                 if self.hitbox.colliderect(enemy_shot.hitbox):
@@ -179,8 +183,10 @@ class Player(pg.sprite.Sprite):
                         enemy_shot.kill()
 
     def reset_powerups(self):
+        self.active_powerup = None
         self.powerup_speed = 0
         self.is_invincible = False
+        sprites.all_fixed_powerups.empty()
 
     def tick_powerup(self):
         current_powerup_tick = pg.time.get_ticks()
@@ -188,7 +194,8 @@ class Player(pg.sprite.Sprite):
             self.powerup_duration = 0
             self.reset_powerups()
 
-    def set_active_powerup(self, powerup: Powerup):
+    def set_active_powerup(self, powerup):
+        self.active_powerup = powerup
         self.powerup_duration = powerup.duration
         self.last_powerup_tick = pg.time.get_ticks()
         powerup.kill()

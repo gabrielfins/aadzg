@@ -2,7 +2,7 @@ import pygame as pg, globals, sprites, colors, sys
 from gameobjects.text import Text
 from gameobjects.button import Button
 
-def game_over():
+def game_win():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 
@@ -10,7 +10,7 @@ def game_over():
     background.fill((0, 0, 0, 200))
     globals.screen.blit(background, (0, 0))
 
-    title = Text('Fim de Jogo', 48, colors.WHITE, globals.screen_rect.width / 2, 100, 'center', 'center')
+    title = Text('Você venceu!', 48, colors.WHITE, globals.screen_rect.width / 2, 100, 'center', 'center')
     all_sprites.add(title)
 
     score_text = Text(f'Pontuação Final: {sprites.saved}', 32, colors.WHITE, globals.screen_rect.width / 2, 200, 'center', 'center')
