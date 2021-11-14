@@ -1,5 +1,6 @@
-import pygame as pg, os, paths, sprites, math
-from random import random, randrange
+import pygame as pg, os, paths, sprites, math, globals
+from gameobjects.camera import Camera
+from random import randrange
 from gameobjects.player import Player
 from gameobjects.map import Map
 from gameobjects.shot import Shot
@@ -57,8 +58,8 @@ class SeekingEnemy(pg.sprite.Sprite):
                 syringe.kill()
 
     def move(self):
-        dx = int(round(self.hitbox.centerx - self.player.hitbox.centerx))
-        dy = int(round(self.hitbox.bottom - self.player.hitbox.bottom))
+        dx = self.hitbox.centerx - self.player.hitbox.centerx
+        dy = self.hitbox.bottom - self.player.hitbox.bottom
 
         self.acc.x = 0
         if dx > 0:
@@ -66,8 +67,6 @@ class SeekingEnemy(pg.sprite.Sprite):
             self.direction = 'left'
         elif dx < 0:
             self.acc.x = 1
-            self.direction = 'right'
-        else:
             self.direction = 'right'
 
         self.acc.y = 0
@@ -86,7 +85,7 @@ class SeekingEnemy(pg.sprite.Sprite):
 
 
 class ShootingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, map: Map, x, y):
+    def __init__(self, player: Player, map: Map, camera: Camera, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = shooting_enemy_sprite_sheet
         self.imgs_cuspidor = []
@@ -100,34 +99,83 @@ class ShootingEnemy(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.hitbox = pg.Rect(0, 0, 17 * 3, 23 * 3)
         self.mask = pg.mask.from_surface(self.image)
+        self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
         self.shot_speed = 5
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
         self.player = player
         self.map = map
+        self.camera = camera
+        self.original_speed = 2
+        self.speed = self.original_speed
+        self.direction = 'right'
 
     def update(self):
-        if self.index_lista > 15:
+        self.move()
+
+        if self.acc.x == 0 and self.acc.y == 0:
+            if self.index_lista > 15:
+                self.index_lista = 0
+
+            self.index_lista += 0.18
+            self.image = self.imgs_cuspidor[int(self.index_lista)]
+        else:
             self.index_lista = 0
+            self.image = self.imgs_cuspidor[int(self.index_lista)]
         
-        self.index_lista += 0.18
-        self.image = self.imgs_cuspidor[int(self.index_lista)]
-        
-        if self.index_lista >= 11:
+        if self.index_lista >= 11 and self.acc.x == 0 and self.acc.y == 0:
             x = self.hitbox.centerx + 15
             y = self.hitbox.centery - 20
             dx = self.player.hitbox.centerx - x
             dy = self.player.hitbox.centery - y
+
+            if dx < 0:
+                self.direction = 'left'
+            elif dx > 0:
+                self.direction = 'right'
+
             deg = math.degrees(math.atan2(-dy, dx))
             self.shoot(deg)
 
-        self.hitbox.center = self.rect.center
+        if self.acc.x != 0 or self.acc.y != 0:
+            self.rect.move_ip(self.speed * self.acc.x, self.speed * self.acc.y)
+            self.hitbox.center = self.rect.center
+
+        if self.direction == 'left':
+            self.image = pg.transform.flip(self.image, True, False)
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
                 get_saved(self)
                 syringe.kill()
+
+    def move(self):
+        dx = self.hitbox.centerx - self.player.hitbox.centerx
+        dy = self.hitbox.centery - self.player.hitbox.centery
+
+        self.acc.x = 0
+        if dx > 0 and self.hitbox.centerx > self.player.hitbox.centerx + globals.WIDTH / 2:
+            self.acc.x = -1
+            self.direction = 'left'
+        elif dx < 0 and self.hitbox.centerx < self.player.hitbox.centerx - globals.WIDTH / 2:
+            self.acc.x = 1
+            self.direction = 'right'
+        else:
+            self.acc.x = 0
+
+        self.acc.y = 0
+        if dy > 0 and self.hitbox.centery > self.player.hitbox.centery + globals.HEIGHT / 2:
+            self.acc.y = -1
+        elif dy < 0 and self.hitbox.centery < self.player.hitbox.centery - globals.HEIGHT / 2:
+            self.acc.y = 1
+        else:
+            self.acc.y = 0
+
+        if dx != 0 and dy != 0:
+            self.speed = int(round(self.original_speed * math.sqrt(2) / 2))
+        else:
+            self.speed = self.original_speed
 
     def shoot(self, angle):
         current_shot = pg.time.get_ticks()
@@ -178,8 +226,8 @@ class FlyingEnemy(pg.sprite.Sprite):
                 syringe.kill()
 
     def move(self):
-        dx = int(round(self.hitbox.centerx - self.player.hitbox.centerx))
-        dy = int(round(self.hitbox.bottom - self.player.hitbox.bottom))
+        dx = self.hitbox.centerx - self.player.hitbox.centerx
+        dy = self.hitbox.bottom - self.player.hitbox.bottom
 
         self.acc.x = 0
         if dx > 0:
@@ -200,7 +248,7 @@ class FlyingEnemy(pg.sprite.Sprite):
 
 
 class DissipatingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, map: Map, x, y):
+    def __init__(self, player: Player, map: Map, camera: Camera, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = dissipating_enemy_sprite_sheet
         self.imgs_dissipador = []
@@ -214,34 +262,59 @@ class DissipatingEnemy(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.hitbox = pg.Rect(0, 0, 23 * 4, 23 * 4)
         self.mask = pg.mask.from_surface(self.image)
+        self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
         self.shot_speed = 5
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
         self.player = player
         self.map = map
+        self.camera = camera
+        self.original_speed = 2
+        self.speed = self.original_speed
+        self.direction = 'right'
+        self.lives = 2
 
     def update(self):
-        if self.index_lista > 79:
+        self.move()
+
+        if self.acc.x == 0 and self.acc.y == 0:
+            if self.index_lista > 79:
+                self.index_lista = 0
+
+            self.index_lista += 0.7
+            self.image = self.imgs_dissipador[int(self.index_lista)]
+        else:
             self.index_lista = 0
+            self.image = self.imgs_dissipador[int(self.index_lista)]
 
-        self.index_lista += 0.7
-        self.image = self.imgs_dissipador[int(self.index_lista)]
-
-        if self.index_lista >= 43:
+        if self.index_lista >= 43 and self.acc.x == 0 and self.acc.y == 0:
             x = self.hitbox.centerx
             y = self.hitbox.centery
             dx = self.player.hitbox.centerx - x
             dy = self.player.hitbox.centery - y
+
+            if dx < 0:
+                self.direction = 'left'
+            elif dx > 0:
+                self.direction = 'right'
+
             deg = math.degrees(math.atan2(-dy, dx))
             self.shoot(deg)
 
-        self.hitbox.center = self.rect.center
+        if self.acc.x != 0 or self.acc.y != 0:
+            self.rect.move_ip(self.speed * self.acc.x, self.speed * self.acc.y)
+            self.hitbox.center = self.rect.center
+
+        if self.direction == 'left':
+            self.image = pg.transform.flip(self.image, True, False)
 
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
-                get_saved(self)
-                syringe.kill()
+                self.lives -= 1
+                if self.lives == 0:
+                    get_saved(self)
+                    syringe.kill()
 
     def shoot(self, angle):
         current_shot = pg.time.get_ticks()
@@ -251,6 +324,33 @@ class DissipatingEnemy(pg.sprite.Sprite):
                 shot = Shot(shot_sprite, self.hitbox.center, 0, 0, self.shot_speed, min((possible_angles), key=lambda i:abs(i-angle)) + i * 20, self.map)
                 sprites.all_enemy_shots.add(shot)
                 sprites.all_sprites.add(shot)
+
+    def move(self):
+        dx = self.hitbox.centerx - self.player.hitbox.centerx
+        dy = self.hitbox.centery - self.player.hitbox.centery
+
+        self.acc.x = 0
+        if dx > 0 and self.hitbox.centerx > self.player.hitbox.centerx + globals.WIDTH / 2:
+            self.acc.x = -1
+            self.direction = 'left'
+        elif dx < 0 and self.hitbox.centerx < self.player.hitbox.centerx - globals.WIDTH / 2:
+            self.acc.x = 1
+            self.direction = 'right'
+        else:
+            self.acc.x = 0
+
+        self.acc.y = 0
+        if dy > 0 and self.hitbox.centery > self.player.hitbox.centery + globals.HEIGHT / 2:
+            self.acc.y = -1
+        elif dy < 0 and self.hitbox.centery < self.player.hitbox.centery - globals.HEIGHT / 2:
+            self.acc.y = 1
+        else:
+            self.acc.y = 0
+
+        if dx != 0 and dy != 0:
+            self.speed = int(round(self.original_speed * math.sqrt(2) / 2))
+        else:
+            self.speed = self.original_speed
 
 class StumblingEnemy(pg.sprite.Sprite):
     def __init__(self, player: Player, x, y):
@@ -271,7 +371,7 @@ class StumblingEnemy(pg.sprite.Sprite):
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
         self.player = player
-        self.original_speed = 2
+        self.original_speed = 1
         self.speed = self.original_speed
         self.direction = 'right'
         self.lives = 3
@@ -296,8 +396,8 @@ class StumblingEnemy(pg.sprite.Sprite):
                     get_saved(self)
 
     def move(self):
-        dx = int(round(self.hitbox.centerx - self.player.hitbox.centerx))
-        dy = int(round(self.hitbox.bottom - self.player.hitbox.bottom))
+        dx = self.hitbox.centerx - self.player.hitbox.centerx
+        dy = self.hitbox.bottom - self.player.hitbox.bottom
 
         self.acc.x = 0
         if dx > 0:
