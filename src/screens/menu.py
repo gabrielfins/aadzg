@@ -83,10 +83,10 @@ def world1_levels_select():
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
                     if world1_button.rect.collidepoint(pg.mouse.get_pos()):
-                        screens.level.level(os.path.join(paths.maps_folder, 'map1.tmx'))
+                        screens.level.level(os.path.join(paths.maps_folder, 'map1.tmx'), [20, 24, 28, 32, 36], [1, 1, 1, 2, 2], [400, 450, 500, 550, 600], [11000, 16000, 16000, 16000, 16000])
                     elif world2_button.rect.collidepoint(pg.mouse.get_pos()):
-                        screens.level.level(os.path.join(paths.maps_folder, 'map2.tmx'))
-                    elif back_button.rect.collidepoint(pg.mouse.get_pos()):
+                        screens.level.level(os.path.join(paths.maps_folder, 'map2.tmx'), [24, 28, 32, 36, 40], [1, 1, 2, 2, 3], [450, 500, 550, 575, 600], [11000, 16000, 16000, 16000, 16000])
+                    elif back_button.rect.collidepoint(pg.mouse.get_pos()): 
                         running = False
 
         globals.screen.fill(colors.BLACK)

@@ -18,7 +18,7 @@ powerup_chance = 6
 
 
 class SeekingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, x, y):
+    def __init__(self, player: Player, x, y, vertical_align = 'left', horizontal_align = 'top'):
         pg.sprite.Sprite.__init__(self)
         self.image = seeking_enemy_sprite_sheet
         self.imgs_corredor = []
@@ -35,6 +35,14 @@ class SeekingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
+        
+        if vertical_align == 'right':
+            self.rect.x -= self.rect.width
+        if horizontal_align == 'bottom':
+            self.rect.x += self.rect.height
+        elif horizontal_align == 'center':
+            self.rect.x += self.rect.height / 2
+
         self.player = player
         self.original_speed = 3
         self.speed = self.original_speed
@@ -62,17 +70,17 @@ class SeekingEnemy(pg.sprite.Sprite):
         dy = self.hitbox.bottom - self.player.hitbox.bottom
 
         self.acc.x = 0
-        if dx > 0:
+        if dx > 3:
             self.acc.x = -1
             self.direction = 'left'
-        elif dx < 0:
+        elif dx < -3:
             self.acc.x = 1
             self.direction = 'right'
 
         self.acc.y = 0
-        if dy > 0:
+        if dy > 3:
             self.acc.y = -1
-        elif dy < 0:
+        elif dy < -3:
             self.acc.y = 1
 
         if dx != 0 and dy != 0:
@@ -85,7 +93,7 @@ class SeekingEnemy(pg.sprite.Sprite):
 
 
 class ShootingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, map: Map, camera: Camera, x, y):
+    def __init__(self, player: Player, map: Map, camera: Camera, x, y, vertical_align = 'left', horizontal_align = 'top'):
         pg.sprite.Sprite.__init__(self)
         self.image = shooting_enemy_sprite_sheet
         self.imgs_cuspidor = []
@@ -101,7 +109,15 @@ class ShootingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
-        self.shot_speed = 5
+
+        if vertical_align == 'right':
+            self.rect.x -= self.rect.width
+        if horizontal_align == 'bottom':
+            self.rect.x += self.rect.height
+        elif horizontal_align == 'center':
+            self.rect.x += self.rect.height / 2
+
+        self.shot_speed = 7
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
         self.player = player
@@ -125,7 +141,7 @@ class ShootingEnemy(pg.sprite.Sprite):
             self.image = self.imgs_cuspidor[int(self.index_lista)]
         
         if self.index_lista >= 11 and self.acc.x == 0 and self.acc.y == 0:
-            x = self.hitbox.centerx + 15
+            x = self.hitbox.centerx
             y = self.hitbox.centery - 20
             dx = self.player.hitbox.centerx - x
             dy = self.player.hitbox.centery - y
@@ -187,7 +203,7 @@ class ShootingEnemy(pg.sprite.Sprite):
 
 
 class FlyingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, x, y):
+    def __init__(self, player: Player, x, y, vertical_align = 'left', horizontal_align = 'top'):
         pg.sprite.Sprite.__init__(self)
         self.image = flying_enemy_sprite_sheet
         self.imgs_baiacu = []
@@ -204,6 +220,14 @@ class FlyingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
+
+        if vertical_align == 'right':
+            self.rect.x -= self.rect.width
+        if horizontal_align == 'bottom':
+            self.rect.x += self.rect.height
+        elif horizontal_align == 'center':
+            self.rect.x += self.rect.height / 2
+
         self.player = player
         self.original_speed = 3
         self.speed = self.original_speed
@@ -230,15 +254,15 @@ class FlyingEnemy(pg.sprite.Sprite):
         dy = self.hitbox.bottom - self.player.hitbox.bottom
 
         self.acc.x = 0
-        if dx > 0:
+        if dx > 3:
             self.acc.x = -1
-        elif dx < 0:
+        elif dx < -3:
             self.acc.x = 1
 
         self.acc.y = 0
-        if dy > 0:
+        if dy > 3:
             self.acc.y = -1
-        elif dy < 0:
+        elif dy < -3:
             self.acc.y = 1
 
         if dx != 0 and dy != 0:
@@ -248,7 +272,7 @@ class FlyingEnemy(pg.sprite.Sprite):
 
 
 class DissipatingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, map: Map, camera: Camera, x, y):
+    def __init__(self, player: Player, map: Map, camera: Camera, x, y, vertical_align = 'left', horizontal_align = 'top'):
         pg.sprite.Sprite.__init__(self)
         self.image = dissipating_enemy_sprite_sheet
         self.imgs_dissipador = []
@@ -264,7 +288,15 @@ class DissipatingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
-        self.shot_speed = 5
+
+        if vertical_align == 'right':
+            self.rect.x -= self.rect.width
+        if horizontal_align == 'bottom':
+            self.rect.x += self.rect.height
+        elif horizontal_align == 'center':
+            self.rect.x += self.rect.height / 2
+
+        self.shot_speed = 7
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
         self.player = player
@@ -312,9 +344,9 @@ class DissipatingEnemy(pg.sprite.Sprite):
         for syringe in sprites.all_syringes:
             if self.hitbox.colliderect(syringe):
                 self.lives -= 1
+                syringe.kill()
                 if self.lives == 0:
                     get_saved(self)
-                    syringe.kill()
 
     def shoot(self, angle):
         current_shot = pg.time.get_ticks()
@@ -353,7 +385,7 @@ class DissipatingEnemy(pg.sprite.Sprite):
             self.speed = self.original_speed
 
 class StumblingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, x, y):
+    def __init__(self, player: Player, x, y, vertical_align = 'left', horizontal_align = 'top'):
         pg.sprite.Sprite.__init__(self)
         self.image = stumbling_enemy_sprite_sheet
         self.imgs_tropego = []
@@ -370,6 +402,14 @@ class StumblingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
+
+        if vertical_align == 'right':
+            self.rect.x -= self.rect.width
+        if horizontal_align == 'bottom':
+            self.rect.x += self.rect.height
+        elif horizontal_align == 'center':
+            self.rect.x += self.rect.height / 2
+
         self.player = player
         self.original_speed = 1
         self.speed = self.original_speed

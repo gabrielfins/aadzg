@@ -1,5 +1,6 @@
-from random import random, randrange
+from random import randrange
 import pygame as pg, globals, colors, sprites, testing, screens.pause, screens.game_over, screens.game_win
+from pygame.version import ver
 from gameobjects.camera import Camera
 from gameobjects.map import Map
 from gameobjects.player import Player
@@ -9,7 +10,7 @@ from gameobjects.obstacle import Obstacle
 from gameobjects.life import Life
 from gameobjects.powerup import Frame
 
-def level(map_path):
+def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, wave_time_interval):
     map = Map(map_path)
     sprites.all_sprites.add(map)
 
@@ -50,7 +51,7 @@ def level(map_path):
     spawned_enemies = 0
     clock = pg.time.Clock()
     dt = 0
-    timer = 11000
+    timer = wave_time_interval[0]
 
     wave_text = Text(f'Rodada {wave_indicator}', 32, colors.WHITE, globals.screen_rect.width / 2, 20, 'center')
     sprites.all_fixed_sprites.add(wave_text)
@@ -96,89 +97,26 @@ def level(map_path):
         timer -= dt
         if timer <= 0:
             wave_indicator = wave + 1 if wave != 5 else wave
-            if wave == 0:
-                for i in range(0, 6, 1):
-                    current_time = pg.time.get_ticks()
-                    if current_time - wave_tick >= 500:
-                        wave_tick = current_time
+            if wave <= 4:
+                current_time = pg.time.get_ticks()
+                if current_time - wave_tick >= wave_spawn_rate[wave]:
+                    type = randrange(0, wave_enemies_chance[wave], 1)
+                    if type == 0:
                         create_enemy(SeekingEnemy, player, map, camera)
-                        spawned_enemies += 1
-                if spawned_enemies >= 20:
+                    elif type == 1:
+                        create_enemy(ShootingEnemy, player, map, camera)
+                    elif type == 2:
+                        create_enemy(FlyingEnemy, player, map, camera)
+                    elif type == 3:
+                        create_enemy(DissipatingEnemy, player, map, camera)
+                    elif type == 4:
+                        create_enemy(StumblingEnemy, player, map, camera)
+                    wave_tick = current_time
+                    spawned_enemies += 1
+                if spawned_enemies >= wave_enemies_ammount[wave]:
                     wave += 1
                     spawned_enemies = 0
-                    timer = 16000
-            if wave == 1:
-                for i in range(0, 9, 1):
-                    current_time = pg.time.get_ticks()
-                    if current_time - wave_tick >= 550:
-                        type = randrange(0, 2, 1)
-                        if type == 0:
-                            create_enemy(SeekingEnemy, player, map, camera)
-                        elif type == 1:
-                            create_enemy(ShootingEnemy, player, map, camera)
-
-                        wave_tick = current_time
-                        spawned_enemies += 1
-                if spawned_enemies >= 35:
-                    wave += 1
-                    spawned_enemies = 0
-                    timer = 16000
-            if wave == 2:
-                for i in range(0, 11, 1):
-                    current_time = pg.time.get_ticks()
-                    if current_time - wave_tick >= 600:
-                        type = randrange(0, 3, 1)
-                        if type == 0:
-                            create_enemy(SeekingEnemy, player, map, camera)
-                        elif type == 1:
-                            create_enemy(ShootingEnemy, player, map, camera)
-                        elif type == 2:
-                            create_enemy(FlyingEnemy, player, map, camera)
-                        wave_tick = current_time
-                        spawned_enemies += 1
-                if spawned_enemies >= 35:
-                    wave += 1
-                    spawned_enemies = 0
-                    timer = 21000
-            if wave == 3:
-                for i in range(0, 13, 1):
-                    current_time = pg.time.get_ticks()
-                    if current_time - wave_tick >= 625:
-                        type = randrange(0, 4, 1)
-                        if type == 0:
-                            create_enemy(SeekingEnemy, player, map, camera)
-                        elif type == 1:
-                            create_enemy(ShootingEnemy, player, map, camera)
-                        elif type == 2:
-                            create_enemy(FlyingEnemy, player, map, camera)
-                        elif type == 3:
-                            create_enemy(DissipatingEnemy, player, map, camera)
-                        wave_tick = current_time
-                        spawned_enemies += 1
-                if spawned_enemies >= 40:
-                    wave += 1
-                    spawned_enemies = 0
-                    timer = 21000
-            if wave == 4:
-                for i in range(0, 15, 1):
-                    current_time = pg.time.get_ticks()
-                    if current_time - wave_tick >= 650:
-                        type = randrange(0, 5, 1)
-                        if type == 0:
-                            create_enemy(SeekingEnemy, player, map, camera)
-                        elif type == 1:
-                            create_enemy(ShootingEnemy, player, map, camera)
-                        elif type == 2:
-                            create_enemy(FlyingEnemy, player, map, camera)
-                        elif type == 3:
-                            create_enemy(DissipatingEnemy, player, map, camera)
-                        elif type == 4:
-                            create_enemy(StumblingEnemy, player, map, camera)
-                        wave_tick = current_time
-                        spawned_enemies += 1
-                if spawned_enemies >= 40:
-                    wave += 1
-                    spawned_enemies = 0
+                    timer = wave_time_interval[wave] if wave <= 4 else 0
 
 
         dt = clock.tick(60)
@@ -205,24 +143,30 @@ def create_enemy(enemy_type, player, map, camera):
     location = randrange(0, 4, 1)
     x = 0
     y = 0
+    vertical_align = 'left'
+    horizontal_align = 'top'
 
     if location == 0:
         x = map.rect.width / 2
         y = 0
+        horizontal_align = 'bottom'
     elif location == 1:
         x = 0
         y = map.rect.height / 2
+        vertical_align = 'right'
+        horizontal_align = 'center'
     elif location == 2:
         x = map.rect.width
         y = map.rect.height / 2
+        horizontal_align = 'center'
     else:
         x = map.rect.width / 2
         y = map.rect.height
 
     if enemy_type == SeekingEnemy or enemy_type == FlyingEnemy or enemy_type == StumblingEnemy:
-        enemy = enemy_type(player, x, y)
+        enemy = enemy_type(player, x, y, vertical_align, horizontal_align)
     elif enemy_type == ShootingEnemy or enemy_type == DissipatingEnemy:
-        enemy = enemy_type(player, map, camera, x, y)
+        enemy = enemy_type(player, map, camera, x, y, vertical_align, horizontal_align)
 
     sprites.all_enemies.add(enemy)
     sprites.all_sprites.add(enemy)
