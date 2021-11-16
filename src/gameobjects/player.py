@@ -32,6 +32,7 @@ class Player(pg.sprite.Sprite):
         self.speed = self.original_speed
         self.shot_speed = 8
         self.shot_cooldown = 450
+        self.shot_amount = 3
         self.last_shot = pg.time.get_ticks()
         self.lives = 3
         self.iframes = 2500
@@ -148,10 +149,13 @@ class Player(pg.sprite.Sprite):
             current_shot = pg.time.get_ticks()
             if current_shot - self.last_shot >= self.shot_cooldown:
                 self.last_shot = current_shot
-                shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.hitbox.center, 0, 0, self.shot_speed, angle, self.map)
-                sprites.all_syringes.add(shot)
-                sprites.all_sprites.add(shot)
+        
+                for i in range(self.shot_amount):
+                    shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.hitbox.center, 0, 0, self.shot_speed, angle + i * 10, self.map)
+                    sprites.all_syringes.add(shot)
+                    sprites.all_sprites.add(shot)
 
+       
     def collide_with_entities(self):
         for powerup in sprites.all_powerups:
             if self.hitbox.colliderect(powerup.hitbox):
