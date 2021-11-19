@@ -17,7 +17,7 @@ def pause():
     resume_button.border_radius = resume_button.rect.height / 2
     all_buttons.add(resume_button)
 
-    exit_button = Button('Sair', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 100, 150, 40, 'center', 'center')
+    exit_button = Button('Sair', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
     exit_button.border_radius = exit_button.rect.height / 2
     all_buttons.add(exit_button)
     

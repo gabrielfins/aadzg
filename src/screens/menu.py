@@ -7,10 +7,9 @@ def world_select():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 
-    title = Text('Seleção de Mundo', 48, colors.WHITE, globals.screen_rect.width / 2, 100, 'center', 'center')
-    all_sprites.add(title)
+    interface = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'world-select.png')), (globals.WIDTH, globals.HEIGHT)).convert_alpha()
     
-    world1_button = Button('Mundo 1', 24, colors.BLUE, globals.screen_rect.width / 3, 300, 150, 40, 'center', 'center')
+    world1_button = Button('Ilha Dos Devorados', 24, colors.BLUE, globals.screen_rect.width / 3, 300, 250, 40, 'center', 'center')
     world1_button.border_radius = world1_button.rect.height / 2
     all_buttons.add(world1_button)
 
@@ -18,7 +17,7 @@ def world_select():
     world2_button.border_radius = world2_button.rect.height / 2
     all_buttons.add(world2_button)
 
-    back_button = Button('Voltar', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 100, 150, 40, 'center', 'center')
+    back_button = Button('Voltar', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
     back_button.border_radius = back_button.rect.height / 2
     all_buttons.add(back_button)
     
@@ -38,13 +37,13 @@ def world_select():
                     elif back_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
 
-        globals.screen.fill(colors.BLACK)
+        globals.screen.blit(interface, (0, 0))
 
         for button in all_buttons:
             if button.rect.collidepoint(pg.mouse.get_pos()):
-                button.color = colors.MAGENTA
+                button.color = colors.DARKBLUE
             else:
-                button.color = colors.BLUE
+                button.color = colors.CYANBLUE
 
         all_sprites.update()
         all_buttons.update()
@@ -58,9 +57,8 @@ def world1_levels_select():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 
-    title = Text('Mundo 1', 48, colors.WHITE, globals.screen_rect.width / 2, 100, 'center', 'center')
-    all_sprites.add(title)
-    
+    interface = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'ilha-dos-devorados.png')), (globals.WIDTH, globals.HEIGHT)).convert_alpha()
+
     world1_button = Button('Fase 1', 24, colors.BLUE, globals.screen_rect.width / 3, 300, 150, 40, 'center', 'center')
     world1_button.border_radius = world1_button.rect.height / 2
     all_buttons.add(world1_button)
@@ -69,7 +67,7 @@ def world1_levels_select():
     world2_button.border_radius = world2_button.rect.height / 2
     all_buttons.add(world2_button)
 
-    back_button = Button('Voltar', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 100, 150, 40, 'center', 'center')
+    back_button = Button('Voltar', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
     back_button.border_radius = back_button.rect.height / 2
     all_buttons.add(back_button)
     
@@ -89,13 +87,13 @@ def world1_levels_select():
                     elif back_button.rect.collidepoint(pg.mouse.get_pos()): 
                         running = False
 
-        globals.screen.fill(colors.BLACK)
+        globals.screen.blit(interface, (0, 0))
 
         for button in all_buttons:
             if button.rect.collidepoint(pg.mouse.get_pos()):
-                button.color = colors.MAGENTA
+                button.color = colors.DARKBLUE
             else:
-                button.color = colors.BLUE
+                button.color = colors.CYANBLUE
 
         all_sprites.update()
         all_buttons.update()
@@ -120,7 +118,7 @@ def world2_levels_select():
     world2_button.border_radius = world2_button.rect.height / 2
     all_buttons.add(world2_button)
 
-    back_button = Button('Voltar', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 100, 150, 40, 'center', 'center')
+    back_button = Button('Voltar', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
     back_button.border_radius = back_button.rect.height / 2
     all_buttons.add(back_button)
     

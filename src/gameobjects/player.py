@@ -1,7 +1,7 @@
 import pygame as pg, os, paths, math, sprites, globals
 from gameobjects.map import Map
 from gameobjects.shot import Shot
-from gameobjects.powerup import Heart, Coffee, FakeCoffee, Mask, FakeMask
+from gameobjects.powerup import FakeFastShot, FastShot, Heart, Coffee, FakeCoffee, Mask, FakeMask, MultiShot, FakeMultiShot
 
 player_sprite_sheet = pg.image.load(os.path.join(paths.player_folder, 'player.png')).convert_alpha()
 shot_sprite = pg.image.load(os.path.join(paths.player_folder, 'syringe.png')).convert_alpha()
@@ -32,7 +32,6 @@ class Player(pg.sprite.Sprite):
         self.speed = self.original_speed
         self.shot_speed = 8
         self.shot_cooldown = 450
-        self.shot_amount = 3
         self.last_shot = pg.time.get_ticks()
         self.lives = 3
         self.iframes = 2500
@@ -42,6 +41,7 @@ class Player(pg.sprite.Sprite):
         self.last_powerup_tick = 0
         self.is_dead = False
         self.is_invincible = False
+        self.is_multi_shot = False
         self.active_powerup = None
 
     def update(self):
@@ -149,9 +149,13 @@ class Player(pg.sprite.Sprite):
             current_shot = pg.time.get_ticks()
             if current_shot - self.last_shot >= self.shot_cooldown:
                 self.last_shot = current_shot
-        
-                for i in range(self.shot_amount):
-                    shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.hitbox.center, 0, 0, self.shot_speed, angle + i * 10, self.map)
+                if self.is_multi_shot:
+                    for i in range(-1, 2, 1):
+                        shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.hitbox.center, 0, 0, self.shot_speed, angle + i * 10, self.map)
+                        sprites.all_syringes.add(shot)
+                        sprites.all_sprites.add(shot)
+                else:
+                    shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.hitbox.center, 0, 0, self.shot_speed, angle, self.map)
                     sprites.all_syringes.add(shot)
                     sprites.all_sprites.add(shot)
 
@@ -171,6 +175,18 @@ class Player(pg.sprite.Sprite):
                     self.set_active_powerup(powerup)
                     fake_mask = FakeMask(30, globals.HEIGHT - 30)
                     sprites.all_fixed_powerups.add(fake_mask)
+                elif type(powerup) == MultiShot:
+                    self.reset_powerups()
+                    self.is_multi_shot = True
+                    self.set_active_powerup(powerup)
+                    fake_multishot = FakeMultiShot(30, globals.HEIGHT - 30)
+                    sprites.all_fixed_powerups.add(fake_multishot)
+                elif type(powerup) == FastShot:
+                    self.reset_powerups()
+                    self.shot_cooldown = 200
+                    self.set_active_powerup(powerup)
+                    fake_fast_shot = FakeFastShot(30, globals.HEIGHT - 30)
+                    sprites.all_fixed_powerups.add(fake_fast_shot)
                 elif type(powerup) == Heart:
                     if self.lives < 3:
                         self.lives += 1
@@ -190,6 +206,8 @@ class Player(pg.sprite.Sprite):
         self.active_powerup = None
         self.powerup_speed = 0
         self.is_invincible = False
+        self.is_multi_shot = False
+        self.shot_cooldown = 450
         sprites.all_fixed_powerups.empty()
 
     def tick_powerup(self):

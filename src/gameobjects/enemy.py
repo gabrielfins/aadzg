@@ -4,7 +4,7 @@ from random import randrange
 from gameobjects.player import Player
 from gameobjects.map import Map
 from gameobjects.shot import Shot
-from gameobjects.powerup import Coffee, Mask, Heart
+from gameobjects.powerup import Coffee, FastShot, Mask, Heart, MultiShot
 
 seeking_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'seeking-enemy.png')).convert_alpha()
 shooting_enemy_sprite_sheet = pg.image.load(os.path.join(paths.enemies_folder, 'shooting-enemy.png')).convert_alpha()
@@ -463,11 +463,19 @@ class StumblingEnemy(pg.sprite.Sprite):
         if self.direction == 'left':
             self.image = pg.transform.flip(self.image, True, False)
 
-
 def get_saved(enemy):
+    generate_powerup(enemy)
+    sprites.saved += 1
+    enemy.kill()
+
+def die(enemy):
+    generate_powerup(enemy)
+    enemy.kill()
+
+def generate_powerup(enemy):
     i = randrange(1, powerup_chance)
     if i == 1:
-        j = randrange(1, 4)
+        j = randrange(1, 6)
         if j == 1:
             powerup = Coffee(enemy.hitbox.centerx, enemy.hitbox.centery)
             sprites.all_powerups.add(powerup)
@@ -477,24 +485,14 @@ def get_saved(enemy):
             sprites.all_powerups.add(powerup)
             sprites.all_sprites.add(powerup)
         elif j == 3:
+            powerup = MultiShot(enemy.hitbox.centerx, enemy.hitbox.centery)
+            sprites.all_powerups.add(powerup)
+            sprites.all_sprites.add(powerup)
+        elif j == 4:
             powerup = Heart(enemy.hitbox.centerx, enemy.hitbox.centery)
             sprites.all_powerups.add(powerup)
             sprites.all_sprites.add(powerup)
-
-    sprites.saved += 1
-    enemy.kill()
-
-def die(enemy):
-    i = randrange(1, powerup_chance)
-    if i == 1:
-        j = randrange(1, 3)
-        if j == 1:
-            powerup = Coffee(enemy.hitbox.centerx, enemy.hitbox.centery)
+        elif j == 5:
+            powerup = FastShot(enemy.hitbox.centerx, enemy.hitbox.centery)
             sprites.all_powerups.add(powerup)
             sprites.all_sprites.add(powerup)
-        elif j == 2:
-            powerup = Mask(enemy.hitbox.centerx, enemy.hitbox.centery)
-            sprites.all_powerups.add(powerup)
-            sprites.all_sprites.add(powerup)
-    
-    enemy.kill()

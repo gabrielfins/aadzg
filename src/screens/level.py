@@ -1,12 +1,11 @@
 from random import randrange
 import pygame as pg, globals, colors, sprites, testing, screens.pause, screens.game_over, screens.game_win
-from pygame.version import ver
 from gameobjects.camera import Camera
 from gameobjects.map import Map
 from gameobjects.player import Player
 from gameobjects.enemy import DissipatingEnemy, FlyingEnemy, SeekingEnemy, ShootingEnemy, StumblingEnemy
 from gameobjects.text import Text
-from gameobjects.obstacle import Obstacle
+from gameobjects.obstacle import Obstacle, TrashRocket
 from gameobjects.life import Life
 from gameobjects.powerup import Frame
 
@@ -26,6 +25,10 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
 
     powerup_frame = Frame(10, globals.HEIGHT - 50)
     sprites.all_fixed_sprites.add(powerup_frame)
+
+    trash_rocket = TrashRocket(map.rect.width - 20, map.rect.height - 20)
+    sprites.all_obstacles.add(trash_rocket)
+    sprites.all_sprites.add(trash_rocket)
 
     all_collidable_groups = [player,
                              sprites.all_syringes,
