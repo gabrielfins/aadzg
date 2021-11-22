@@ -6,10 +6,9 @@ from gameobjects.player import Player
 from gameobjects.enemy import DissipatingEnemy, FlyingEnemy, SeekingEnemy, ShootingEnemy, StumblingEnemy
 from gameobjects.text import Text
 from gameobjects.obstacle import Obstacle, TrashRocket
-from gameobjects.life import Life
 from gameobjects.powerup import Frame
 
-def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, wave_time_interval):
+def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, wave_time_interval, lrange_start = 0, lrange_end = 4, lrange_step = 1):
     map = Map(map_path)
     sprites.all_sprites.add(map)
 
@@ -36,15 +35,6 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
                              sprites.all_enemy_shots,
                              sprites.all_powerups,
                              sprites.all_obstacles]
-
-    all_lives = []
-
-    for i in range(player.lives):
-        empty_life = Life(30 * i + 10, 10, 'empty')
-        sprites.all_fixed_sprites.add(empty_life)
-        life = Life(30 * i + 10, 10)
-        all_lives.append(life)
-        sprites.all_fixed_sprites.add(life)
 
     saved_text = Text(f'Salvos: {sprites.saved}', 32, colors.WHITE, globals.screen_rect.width - 20, 20, 'right')
     sprites.all_fixed_sprites.add(saved_text)
@@ -88,15 +78,6 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
         sprites.all_fixed_sprites.update()
         camera.update(player)
 
-        for life in all_lives:
-            sprites.all_fixed_sprites.remove(life)
-
-        all_lives.clear()
-        for i in range(player.lives):
-            life = Life(30 * i + 10, 10)
-            all_lives.append(life)
-            sprites.all_fixed_sprites.add(life)
-
         timer -= dt
         if timer <= 0:
             wave_indicator = wave + 1 if wave != 5 else wave
@@ -105,15 +86,15 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
                 if current_time - wave_tick >= wave_spawn_rate[wave]:
                     type = randrange(0, wave_enemies_chance[wave], 1)
                     if type == 0:
-                        create_enemy(SeekingEnemy, player, map, camera)
+                        create_enemy(SeekingEnemy, player, map, camera, lrange_start, lrange_end, lrange_step)
                     elif type == 1:
-                        create_enemy(ShootingEnemy, player, map, camera)
+                        create_enemy(ShootingEnemy, player, map, camera, lrange_start, lrange_end, lrange_step)
                     elif type == 2:
-                        create_enemy(FlyingEnemy, player, map, camera)
+                        create_enemy(FlyingEnemy, player, map, camera, lrange_start, lrange_end, lrange_step)
                     elif type == 3:
-                        create_enemy(DissipatingEnemy, player, map, camera)
+                        create_enemy(DissipatingEnemy, player, map, camera, lrange_start, lrange_end, lrange_step)
                     elif type == 4:
-                        create_enemy(StumblingEnemy, player, map, camera)
+                        create_enemy(StumblingEnemy, player, map, camera, lrange_start, lrange_end, lrange_step)
                     wave_tick = current_time
                     spawned_enemies += 1
                 if spawned_enemies >= wave_enemies_ammount[wave]:
@@ -142,34 +123,28 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
         pg.display.update()
         globals.clock.tick(globals.FPS)
 
-def create_enemy(enemy_type, player, map, camera):
-    location = randrange(0, 4, 1)
+def create_enemy(enemy_type, player, map, camera, lrange_start, lrange_end, lrange_step):
     x = 0
     y = 0
-    vertical_align = 'left'
-    horizontal_align = 'top'
 
+    location = randrange(lrange_start, lrange_end, lrange_step)
     if location == 0:
         x = map.rect.width / 2
         y = 0
-        horizontal_align = 'bottom'
     elif location == 1:
         x = 0
         y = map.rect.height / 2
-        vertical_align = 'right'
-        horizontal_align = 'center'
     elif location == 2:
         x = map.rect.width
         y = map.rect.height / 2
-        horizontal_align = 'center'
     else:
         x = map.rect.width / 2
         y = map.rect.height
 
     if enemy_type == SeekingEnemy or enemy_type == FlyingEnemy or enemy_type == StumblingEnemy:
-        enemy = enemy_type(player, x, y, vertical_align, horizontal_align)
+        enemy = enemy_type(player, x, y)
     elif enemy_type == ShootingEnemy or enemy_type == DissipatingEnemy:
-        enemy = enemy_type(player, map, camera, x, y, vertical_align, horizontal_align)
+        enemy = enemy_type(player, map, camera, x, y)
 
     sprites.all_enemies.add(enemy)
     sprites.all_sprites.add(enemy)

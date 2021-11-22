@@ -1,4 +1,7 @@
 import pygame as pg, os, paths, math, sprites, globals
+
+from pygame.display import update
+from gameobjects.life import Life
 from gameobjects.map import Map
 from gameobjects.shot import Shot
 from gameobjects.powerup import FakeFastShot, FastShot, Heart, Coffee, FakeCoffee, Mask, FakeMask, MultiShot, FakeMultiShot
@@ -43,6 +46,7 @@ class Player(pg.sprite.Sprite):
         self.is_invincible = False
         self.is_multi_shot = False
         self.active_powerup = None
+        self.update_lives()
 
     def update(self):
         self.image = self.animation_sprites[int(self.animation_step if self.animation_step <= 3 else 3)][self.direction]
@@ -151,11 +155,11 @@ class Player(pg.sprite.Sprite):
                 self.last_shot = current_shot
                 if self.is_multi_shot:
                     for i in range(-1, 2, 1):
-                        shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.hitbox.center, 0, 0, self.shot_speed, angle + i * 10, self.map)
+                        shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.rect.center, 0, 10, self.shot_speed, angle + i * 10, self.map)
                         sprites.all_syringes.add(shot)
                         sprites.all_sprites.add(shot)
                 else:
-                    shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.hitbox.center, 0, 0, self.shot_speed, angle, self.map)
+                    shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.rect.center, 0, 10, self.shot_speed, angle, self.map)
                     sprites.all_syringes.add(shot)
                     sprites.all_sprites.add(shot)
 
@@ -190,6 +194,7 @@ class Player(pg.sprite.Sprite):
                 elif type(powerup) == Heart:
                     if self.lives < 3:
                         self.lives += 1
+                        self.update_lives()
                         powerup.kill()
 
         if not self.is_invincible:
@@ -228,5 +233,19 @@ class Player(pg.sprite.Sprite):
         if is_hit:
             self.last_hit = current_hit
             self.lives -= 1
+
+        self.update_lives()
         
         return is_hit
+
+    def update_lives(self):
+        all_lives.empty()
+        for i in range(3):
+            if i + 1 <= self.lives:
+                life = Life(30 * i + 10, 10)
+                all_lives.add(life)
+                sprites.all_fixed_sprites.add(life)
+            else:
+                empty_life = Life(30 * i + 10, 10, 'empty')
+                all_lives.add(empty_life)
+                sprites.all_fixed_sprites.add(empty_life)

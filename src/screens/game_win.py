@@ -16,7 +16,7 @@ def game_win():
     score_text = Text(f'Pontuação Final: {sprites.saved}', 32, colors.WHITE, globals.screen_rect.width / 2, 200, 'center', 'center')
     all_sprites.add(score_text)
     
-    exit_button = Button('Sair', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 100, 150, 40, 'center', 'center')
+    exit_button = Button('Sair', 24, colors.DARKBLUE, colors.CYANBLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 100, 150, 40, 'center', 'center')
     exit_button.border_radius = exit_button.rect.height / 2
     all_buttons.add(exit_button)
     

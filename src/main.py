@@ -7,11 +7,11 @@ all_buttons = sprites.ButtonGroup()
 
 interface = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'interface.png')), (globals.WIDTH, globals.HEIGHT)).convert_alpha()
 
-play_button = Button('Jogar', 24, colors.DARKBLUE, globals.screen_rect.width / 2, 376, 150, 40, 'center', 'center')
+play_button = Button('Jogar', 24, colors.DARKBLUE, colors.CYANBLUE, globals.screen_rect.width / 2, 376, 150, 40, 'center', 'center')
 play_button.border_radius = play_button.rect.height / 2
 all_buttons.add(play_button)
 
-exit_button = Button('Sair', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
+exit_button = Button('Sair', 24, colors.DARKBLUE, colors.CYANBLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
 exit_button.border_radius = exit_button.rect.height / 2
 all_buttons.add(exit_button)
 
@@ -28,12 +28,6 @@ while running:
                     running = False
 
     globals.screen.blit(interface, (0, 0))
-
-    for button in all_buttons:
-        if button.rect.collidepoint(pg.mouse.get_pos()):
-            button.color = colors.DARKBLUE
-        else:
-            button.color = colors.CYANBLUE
 
     all_sprites.update()
     all_buttons.update()

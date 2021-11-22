@@ -13,11 +13,11 @@ def pause():
     title = Text('Pause', 48, colors.WHITE, globals.screen_rect.width / 2, 100, 'center', 'center')
     all_sprites.add(title)
     
-    resume_button = Button('Resumir', 24, colors.BLUE, globals.screen_rect.width / 2, 300, 150, 40, 'center', 'center')
+    resume_button = Button('Resumir', 24, colors.DARKBLUE, colors.CYANBLUE, globals.screen_rect.width / 2, 300, 150, 40, 'center', 'center')
     resume_button.border_radius = resume_button.rect.height / 2
     all_buttons.add(resume_button)
 
-    exit_button = Button('Sair', 24, colors.BLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
+    exit_button = Button('Sair', 24, colors.DARKBLUE, colors.CYANBLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
     exit_button.border_radius = exit_button.rect.height / 2
     all_buttons.add(exit_button)
     
@@ -40,12 +40,6 @@ def pause():
                     elif exit_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
                         return False
-
-        for button in all_buttons:
-            if button.rect.collidepoint(pg.mouse.get_pos()):
-                button.color = colors.MAGENTA
-            else:
-                button.color = colors.BLUE
 
         all_sprites.update()
         all_buttons.update()

@@ -18,7 +18,7 @@ powerup_chance = 6
 
 
 class SeekingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, x, y, vertical_align = 'left', horizontal_align = 'top'):
+    def __init__(self, player: Player, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = seeking_enemy_sprite_sheet
         self.imgs_corredor = []
@@ -35,14 +35,6 @@ class SeekingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
-        
-        if vertical_align == 'right':
-            self.rect.x -= self.rect.width
-        if horizontal_align == 'bottom':
-            self.rect.x += self.rect.height
-        elif horizontal_align == 'center':
-            self.rect.x += self.rect.height / 2
-
         self.player = player
         self.original_speed = 3
         self.speed = self.original_speed
@@ -93,7 +85,7 @@ class SeekingEnemy(pg.sprite.Sprite):
 
 
 class ShootingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, map: Map, camera: Camera, x, y, vertical_align = 'left', horizontal_align = 'top'):
+    def __init__(self, player: Player, map: Map, camera: Camera, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = shooting_enemy_sprite_sheet
         self.imgs_cuspidor = []
@@ -109,15 +101,7 @@ class ShootingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
-
-        if vertical_align == 'right':
-            self.rect.x -= self.rect.width
-        if horizontal_align == 'bottom':
-            self.rect.x += self.rect.height
-        elif horizontal_align == 'center':
-            self.rect.x += self.rect.height / 2
-
-        self.shot_speed = 7
+        self.shot_speed = 6
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
         self.player = player
@@ -203,7 +187,7 @@ class ShootingEnemy(pg.sprite.Sprite):
 
 
 class FlyingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, x, y, vertical_align = 'left', horizontal_align = 'top'):
+    def __init__(self, player: Player, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = flying_enemy_sprite_sheet
         self.imgs_baiacu = []
@@ -220,14 +204,6 @@ class FlyingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
-
-        if vertical_align == 'right':
-            self.rect.x -= self.rect.width
-        if horizontal_align == 'bottom':
-            self.rect.x += self.rect.height
-        elif horizontal_align == 'center':
-            self.rect.x += self.rect.height / 2
-
         self.player = player
         self.original_speed = 3
         self.speed = self.original_speed
@@ -272,7 +248,7 @@ class FlyingEnemy(pg.sprite.Sprite):
 
 
 class DissipatingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, map: Map, camera: Camera, x, y, vertical_align = 'left', horizontal_align = 'top'):
+    def __init__(self, player: Player, map: Map, camera: Camera, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = dissipating_enemy_sprite_sheet
         self.imgs_dissipador = []
@@ -288,15 +264,7 @@ class DissipatingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
-
-        if vertical_align == 'right':
-            self.rect.x -= self.rect.width
-        if horizontal_align == 'bottom':
-            self.rect.x += self.rect.height
-        elif horizontal_align == 'center':
-            self.rect.x += self.rect.height / 2
-
-        self.shot_speed = 7
+        self.shot_speed = 6
         self.shot_cooldown = 1000
         self.last_shot = pg.time.get_ticks()
         self.player = player
@@ -385,7 +353,7 @@ class DissipatingEnemy(pg.sprite.Sprite):
             self.speed = self.original_speed
 
 class StumblingEnemy(pg.sprite.Sprite):
-    def __init__(self, player: Player, x, y, vertical_align = 'left', horizontal_align = 'top'):
+    def __init__(self, player: Player, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = stumbling_enemy_sprite_sheet
         self.imgs_tropego = []
@@ -402,14 +370,6 @@ class StumblingEnemy(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.acc = pg.Vector2(0, 0)
         self.rect.center = (x, y)
-
-        if vertical_align == 'right':
-            self.rect.x -= self.rect.width
-        if horizontal_align == 'bottom':
-            self.rect.x += self.rect.height
-        elif horizontal_align == 'center':
-            self.rect.x += self.rect.height / 2
-
         self.player = player
         self.original_speed = 1
         self.speed = self.original_speed
