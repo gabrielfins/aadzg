@@ -136,8 +136,12 @@ def world2_levels_select():
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
                     if level1_button.rect.collidepoint(pg.mouse.get_pos()):
-                        screens.level.level(os.path.join(paths.maps_folder, 'world2_level3.tmx'), [20, 24, 28, 32, 36], [1, 1, 1, 2, 2], [400, 450, 500, 550, 600], [11000, 16000, 16000, 16000, 16000], 1)
-                    if back_button.rect.collidepoint(pg.mouse.get_pos()):
+                        screens.level.level(os.path.join(paths.maps_folder, 'world2_level1.tmx'), [22, 26, 31, 36, 40], [2, 2, 2, 3, 4], [500, 510, 520, 530, 540], [11000, 16000, 16000, 16000, 16000], 0, 4, 3)
+                    elif level2_button.rect.collidepoint(pg.mouse.get_pos()):
+                        screens.level.level(os.path.join(paths.maps_folder, 'world2_level2.tmx'), [26, 29, 34, 40, 46], [2, 2, 3, 4, 4], [500, 525, 550, 575, 600], [11000, 16000, 16000, 16000, 16000])
+                    elif level3_button.rect.collidepoint(pg.mouse.get_pos()):
+                        screens.level.level(os.path.join(paths.maps_folder, 'world2_level3.tmx'), [29, 36, 40, 43, 48], [2, 2, 3, 4, 5], [510, 540, 570, 600, 630], [11000, 16000, 16000, 16000, 16000], 1)
+                    elif back_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
 
         globals.screen.fill(colors.BLACK)
