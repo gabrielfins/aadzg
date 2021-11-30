@@ -32,12 +32,10 @@ class Text(pg.sprite.Sprite):
         else:
             self.rect.x = self.x
 
-        if self.horizontal_align == 'bottom':
+        if self.vertical_align == 'bottom':
             self.rect.y = self.y - self.rect.height
-        elif self.horizontal_align == 'center':
+        elif self.vertical_align == 'center':
             self.rect.y = self.y - self.rect.height / 2
         else:
             self.rect.y = self.y
-
-        self.rect.y = self.y
         

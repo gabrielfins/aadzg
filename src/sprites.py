@@ -3,6 +3,7 @@ from gameobjects.camera import Camera
 
 show_hitboxes = False
 show_image_boxes = False
+show_hub = True
 saved = 0
 
 

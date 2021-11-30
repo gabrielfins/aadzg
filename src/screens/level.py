@@ -8,7 +8,7 @@ from gameobjects.text import Text
 from gameobjects.obstacle import Obstacle, TrashRocket
 from gameobjects.powerup import Frame
 
-def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, wave_time_interval, lrange_start = 0, lrange_end = 4, lrange_step = 1):
+def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, wave_time_interval, lrange_start=0, lrange_end=4, lrange_step=1, show_trash_rocket=True):
     map = Map(map_path)
     sprites.all_sprites.add(map)
 
@@ -22,12 +22,13 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
     player = Player(map)
     sprites.all_sprites.add(player)
 
-    powerup_frame = Frame(10, globals.HEIGHT - 50)
+    powerup_frame = Frame(20, globals.HEIGHT - 20)
     sprites.all_fixed_sprites.add(powerup_frame)
 
-    trash_rocket = TrashRocket(map.rect.width - 20, map.rect.height - 20)
-    sprites.all_obstacles.add(trash_rocket)
-    sprites.all_sprites.add(trash_rocket)
+    if show_trash_rocket:
+        trash_rocket = TrashRocket(map.rect.width - 20, map.rect.height - 20)
+        sprites.all_obstacles.add(trash_rocket)
+        sprites.all_sprites.add(trash_rocket)
 
     all_collidable_groups = [player,
                              sprites.all_syringes,
@@ -66,16 +67,23 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
                     running = screens.pause.pause()
                     if running == False:
                         empty_sprite_groups()
+                elif event.key == pg.K_F1:
+                    sprites.show_hub = not sprites.show_hub
                 elif event.key == pg.K_F2:
                     sprites.show_image_boxes = not sprites.show_image_boxes
                 elif event.key == pg.K_F3:
                     sprites.show_hitboxes = not sprites.show_hitboxes
+                elif event.key == pg.K_F4:
+                    player.is_god_mode = not player.is_god_mode
 
         sprites.all_sprites.update()
         saved_text.text = f'Salvos: {sprites.saved}'
         wave_text.text = f'Rodada {wave_indicator}'
         time_to_wave_text.text = f'{int(timer / 1000 if timer >= 0 else 0)}'
-        sprites.all_fixed_sprites.update()
+
+        if sprites.show_hub:
+            sprites.all_fixed_sprites.update()
+
         camera.update(player)
 
         timer -= dt
@@ -106,9 +114,13 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
         dt = clock.tick(60)
 
         sprites.all_sprites.draw(globals.screen, camera)
-        sprites.all_fixed_sprites.draw(globals.screen)
-        sprites.all_fixed_powerups.draw(globals.screen)
-        testing.draw(all_collidable_groups, camera)
+        
+        if sprites.show_hub:
+            sprites.all_fixed_sprites.draw(globals.screen)
+            sprites.all_fixed_powerups.draw(globals.screen)
+        
+        if sprites.show_image_boxes or sprites.show_hitboxes:
+            testing.draw(all_collidable_groups, camera)
 
         if player.is_dead:
             screens.game_over.game_over()

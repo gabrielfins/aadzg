@@ -85,7 +85,7 @@ class Frame(pg.sprite.Sprite):
         self.image = frame_sprite
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y
+        self.rect.y = y - self.rect.height
 
 
 class MultiShot(pg.sprite.Sprite):

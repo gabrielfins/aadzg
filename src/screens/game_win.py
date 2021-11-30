@@ -32,12 +32,6 @@ def game_win():
                     if exit_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
 
-        for button in all_buttons:
-            if button.rect.collidepoint(pg.mouse.get_pos()):
-                button.color = colors.MAGENTA
-            else:
-                button.color = colors.BLUE
-
         all_sprites.update()
         all_buttons.update()
         all_sprites.draw(globals.screen)

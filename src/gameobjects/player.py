@@ -1,9 +1,8 @@
-import pygame as pg, os, paths, math, sprites, globals
-
-from pygame.display import update
+import pygame as pg, os, paths, math, sprites, globals, colors
 from gameobjects.life import Life
 from gameobjects.map import Map
 from gameobjects.shot import Shot
+from gameobjects.text import Text
 from gameobjects.powerup import FakeFastShot, FastShot, Heart, Coffee, FakeCoffee, Mask, FakeMask, MultiShot, FakeMultiShot
 
 player_sprite_sheet = pg.image.load(os.path.join(paths.player_folder, 'player.png')).convert_alpha()
@@ -46,7 +45,9 @@ class Player(pg.sprite.Sprite):
         self.is_invincible = False
         self.is_multi_shot = False
         self.active_powerup = None
+        self.is_god_mode = False
         self.update_lives()
+        self.god_mode_text = Text('Modo Deus ATIVADO', 24, colors.WHITE, globals.WIDTH - 20, globals.HEIGHT - 20, 'right', 'bottom')
 
     def update(self):
         self.image = self.animation_sprites[int(self.animation_step if self.animation_step <= 3 else 3)][self.direction]
@@ -56,6 +57,11 @@ class Player(pg.sprite.Sprite):
         self.move(key)
         self.collide_with_entities()
         self.tick_powerup()
+
+        if self.is_god_mode:
+            sprites.all_fixed_sprites.add(self.god_mode_text)
+        else:
+            sprites.all_fixed_sprites.remove(self.god_mode_text)
 
         if self.lives == 0:
             self.is_dead = True
@@ -162,8 +168,7 @@ class Player(pg.sprite.Sprite):
                     shot = Shot(pg.transform.scale(shot_sprite, (36, 14)), self.rect.center, 0, 10, self.shot_speed, angle, self.map)
                     sprites.all_syringes.add(shot)
                     sprites.all_sprites.add(shot)
-
-       
+  
     def collide_with_entities(self):
         for powerup in sprites.all_powerups:
             if self.hitbox.colliderect(powerup.hitbox):
@@ -171,25 +176,25 @@ class Player(pg.sprite.Sprite):
                     self.reset_powerups()
                     self.powerup_speed = 1
                     self.set_active_powerup(powerup)
-                    fake_coffee = FakeCoffee(30, globals.HEIGHT - 30)
+                    fake_coffee = FakeCoffee(40, globals.HEIGHT - 40)
                     sprites.all_fixed_powerups.add(fake_coffee)
                 elif type(powerup) == Mask:
                     self.reset_powerups()
                     self.is_invincible = True
                     self.set_active_powerup(powerup)
-                    fake_mask = FakeMask(30, globals.HEIGHT - 30)
+                    fake_mask = FakeMask(40, globals.HEIGHT - 40)
                     sprites.all_fixed_powerups.add(fake_mask)
                 elif type(powerup) == MultiShot:
                     self.reset_powerups()
                     self.is_multi_shot = True
                     self.set_active_powerup(powerup)
-                    fake_multishot = FakeMultiShot(30, globals.HEIGHT - 30)
+                    fake_multishot = FakeMultiShot(40, globals.HEIGHT - 40)
                     sprites.all_fixed_powerups.add(fake_multishot)
                 elif type(powerup) == FastShot:
                     self.reset_powerups()
                     self.shot_cooldown = 200
                     self.set_active_powerup(powerup)
-                    fake_fast_shot = FakeFastShot(30, globals.HEIGHT - 30)
+                    fake_fast_shot = FakeFastShot(40, globals.HEIGHT - 40)
                     sprites.all_fixed_powerups.add(fake_fast_shot)
                 elif type(powerup) == Heart:
                     if self.lives < 3:
@@ -197,7 +202,7 @@ class Player(pg.sprite.Sprite):
                         self.update_lives()
                         powerup.kill()
 
-        if not self.is_invincible:
+        if not self.is_invincible and not self.is_god_mode:
             for enemy in sprites.all_enemies:
                 if self.hitbox.colliderect(enemy.hitbox):
                     self.get_hit()
@@ -242,10 +247,10 @@ class Player(pg.sprite.Sprite):
         all_lives.empty()
         for i in range(3):
             if i + 1 <= self.lives:
-                life = Life(30 * i + 10, 10)
+                life = Life(30 * i + 20, 20)
                 all_lives.add(life)
                 sprites.all_fixed_sprites.add(life)
             else:
-                empty_life = Life(30 * i + 10, 10, 'empty')
+                empty_life = Life(30 * i + 20, 20, 'empty')
                 all_lives.add(empty_life)
                 sprites.all_fixed_sprites.add(empty_life)
