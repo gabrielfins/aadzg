@@ -1,9 +1,14 @@
 import pygame as pg, globals, sprites, colors, screens.menu, screens.controls, os, paths
 from gameobjects.button import Button
+from pygame import mixer
 
 pg.init()
 all_sprites = pg.sprite.Group()
 all_buttons = sprites.ButtonGroup()
+
+mixer.init()
+mixer.music.load('Tema_fundo.mp3')
+mixer.music.play(-1)
 
 interface = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'interface.png')), (globals.WIDTH, globals.HEIGHT)).convert_alpha()
 
