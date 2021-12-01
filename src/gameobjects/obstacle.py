@@ -10,6 +10,14 @@ class Obstacle(pg.sprite.Sprite):
         self.hitbox = self.rect
 
 
+class ObstacleImage(pg.sprite.Sprite):
+    def __init__(self, image, x, y):
+        pg.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+
+
 class TrashRocket(pg.sprite.Sprite):
     def __init__(self, x, y):
         pg.sprite.Sprite.__init__(self)

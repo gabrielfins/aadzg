@@ -10,14 +10,14 @@ def pause():
     background.fill((0, 0, 0, 200))
     globals.screen.blit(background, (0, 0))
 
-    title = Text('Pause', 48, colors.WHITE, globals.screen_rect.width / 2, 100, 'center', 'center')
+    title = Text('Pause', 48, colors.WHITE, globals.WIDTH / 2, 100, 'center', 'center')
     all_sprites.add(title)
     
-    resume_button = Button('Resumir', 24, colors.DARKBLUE, colors.CYANBLUE, globals.screen_rect.width / 2, 300, 150, 40, 'center', 'center')
+    resume_button = Button('Resumir', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 300, 150, 40, 'center', 'center')
     resume_button.border_radius = resume_button.rect.height / 2
     all_buttons.add(resume_button)
 
-    exit_button = Button('Sair', 24, colors.DARKBLUE, colors.CYANBLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
+    exit_button = Button('Sair', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, globals.HEIGHT - 50, 150, 40, 'center', 'center')
     exit_button.border_radius = exit_button.rect.height / 2
     all_buttons.add(exit_button)
     

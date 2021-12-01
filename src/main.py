@@ -1,4 +1,4 @@
-import pygame as pg, globals, sprites, colors, screens.menu, os, paths
+import pygame as pg, globals, sprites, colors, screens.menu, screens.controls, os, paths
 from gameobjects.button import Button
 
 pg.init()
@@ -7,11 +7,15 @@ all_buttons = sprites.ButtonGroup()
 
 interface = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'interface.png')), (globals.WIDTH, globals.HEIGHT)).convert_alpha()
 
-play_button = Button('Jogar', 24, colors.DARKBLUE, colors.CYANBLUE, globals.screen_rect.width / 2, 376, 150, 40, 'center', 'center')
+play_button = Button('Jogar', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 376, 150, 40, 'center', 'center')
 play_button.border_radius = play_button.rect.height / 2
 all_buttons.add(play_button)
 
-exit_button = Button('Sair', 24, colors.DARKBLUE, colors.CYANBLUE, globals.screen_rect.width / 2, globals.screen_rect.height - 50, 150, 40, 'center', 'center')
+controls_button = Button('Controles', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 436, 150, 40, 'center', 'center')
+controls_button.border_radius = play_button.rect.height / 2
+all_buttons.add(controls_button)
+
+exit_button = Button('Sair', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, globals.HEIGHT - 50, 150, 40, 'center', 'center')
 exit_button.border_radius = exit_button.rect.height / 2
 all_buttons.add(exit_button)
 
@@ -24,6 +28,8 @@ while running:
             if event.button == 1:
                 if play_button.rect.collidepoint(pg.mouse.get_pos()):
                     screens.menu.world_select()
+                elif controls_button.rect.collidepoint(pg.mouse.get_pos()):
+                    screens.controls.controls()
                 elif exit_button.rect.collidepoint(pg.mouse.get_pos()):
                     running = False
 

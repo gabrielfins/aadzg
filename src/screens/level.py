@@ -37,7 +37,7 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
                              sprites.all_powerups,
                              sprites.all_obstacles]
 
-    saved_text = Text(f'Salvos: {sprites.saved}', 32, colors.WHITE, globals.screen_rect.width - 20, 20, 'right')
+    saved_text = Text(f'Salvos: {sprites.saved}', 32, colors.WHITE, globals.WIDTH - 20, 20, 'right')
     sprites.all_fixed_sprites.add(saved_text)
 
     wave = 0
@@ -47,10 +47,10 @@ def level(map_path, wave_enemies_ammount, wave_enemies_chance, wave_spawn_rate, 
     dt = 0
     timer = wave_time_interval[0]
 
-    wave_text = Text(f'Rodada {wave_indicator}', 32, colors.WHITE, globals.screen_rect.width / 2, 20, 'center')
+    wave_text = Text(f'Rodada {wave_indicator}', 32, colors.WHITE, globals.WIDTH / 2, 20, 'center')
     sprites.all_fixed_sprites.add(wave_text)
 
-    time_to_wave_text = Text(f'{int(timer / 1000 if timer >= 0 else 0)}', 24, colors.WHITE, globals.screen_rect.width / 2, 50, 'center')
+    time_to_wave_text = Text(f'{int(timer / 1000 if timer >= 0 else 0)}', 24, colors.WHITE, globals.WIDTH / 2, 50, 'center')
     sprites.all_fixed_sprites.add(time_to_wave_text)
 
     wave_tick = pg.time.get_ticks()
