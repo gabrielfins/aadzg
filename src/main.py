@@ -8,6 +8,7 @@ all_buttons = sprites.ButtonGroup()
 
 mixer.init()
 mixer.music.load(os.path.join(paths.resources_folder, 'Tema_fundo.mp3'))
+mixer.music.set_volume(0.2)
 mixer.music.play(-1)
 
 interface = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'interface.png')), (globals.WIDTH, globals.HEIGHT)).convert_alpha()
