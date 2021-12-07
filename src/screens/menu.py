@@ -9,15 +9,15 @@ def world_select():
 
     interface = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'world-select.png')), (globals.WIDTH, globals.HEIGHT)).convert_alpha()
     
-    world1_button = Button('Ilha Dos Devorados', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 300, 300, 40, 'center', 'center')
+    world1_button = Button('Ilha Dos Devorados', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 300, 260, 40, 'center', 'center')
     world1_button.border_radius = world1_button.rect.height / 2
     all_buttons.add(world1_button)
 
-    world2_button = Button('Deserto Dos Infectados', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 360, 300, 40, 'center', 'center')
+    world2_button = Button('Litoral Misterioso', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 360, 226, 40, 'center', 'center')
     world2_button.border_radius = world2_button.rect.height / 2
     all_buttons.add(world2_button)
 
-    world3_button = Button('Bloqueado', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 420, 150, 40, 'center', 'center')
+    world3_button = Button('Deserto dos Infectados', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 420, 266, 40, 'center', 'center')
     world3_button.border_radius = world3_button.rect.height / 2
     all_buttons.add(world3_button)
 
@@ -107,7 +107,7 @@ def world2_levels_select():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 
-    Deserto = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'Deserto_dos_Infectados.png')),(globals.WIDTH, globals.HEIGHT)).convert_alpha()
+    litoral = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'Litoral-Misterioso.png')),(globals.WIDTH, globals.HEIGHT)).convert_alpha()
 
     level1_button = Button('Fase 1', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 5, 360, 150, 40, 'center', 'center')
     level1_button.border_radius = level1_button.rect.height / 2
@@ -143,7 +143,7 @@ def world2_levels_select():
                     elif back_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
 
-        globals.screen.blit(Deserto, (0, 0))
+        globals.screen.blit(litoral, (0, 0))
 
         all_sprites.update()
         all_buttons.update()
@@ -157,8 +157,7 @@ def world3_levels_select():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 
-    title = Text('Mundo 3', 48, colors.WHITE, globals.WIDTH / 2, 100, 'center', 'center')
-    all_sprites.add(title)
+    deserto = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'Deserto-dos-infectados.png')),(globals.WIDTH, globals.HEIGHT)).convert_alpha()
     
     level1_button = Button('Fase 1', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 5, 360, 150, 40, 'center', 'center')
     level1_button.border_radius = level1_button.rect.height / 2
@@ -194,7 +193,7 @@ def world3_levels_select():
                     elif back_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
 
-        globals.screen.fill(colors.BLACK)
+        globals.screen.blit(deserto, (0, 0))
 
         all_sprites.update()
         all_buttons.update()

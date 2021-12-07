@@ -10,21 +10,7 @@ def controls():
     all_sprites = pg.sprite.Group()
     all_buttons = sprites.ButtonGroup()
 
-    title = Text('Controles', 48, colors.WHITE, globals.WIDTH / 2, 100, 'center', 'center')
-    all_sprites.add(title)
-
-    walk_image = ObstacleImage(pg.transform.scale(walk_keys_sprite, (192, 128)), globals.WIDTH / 3, 300)
-    all_sprites.add(walk_image)
-
-    walk_text = Text('Andar', 32, colors.WHITE, globals.WIDTH / 3, 410, 'center', 'center')
-    all_sprites.add(walk_text)
-
-    shoot_image = ObstacleImage(pg.transform.scale(shoot_keys_sprite, (192, 128)), globals.WIDTH / 1.5, 300)
-    all_sprites.add(shoot_image)
-
-    shoot_text = Text('Atirar', 32, colors.WHITE, globals.WIDTH / 1.5, 410, 'center', 'center')
-    all_sprites.add(shoot_text)
-    
+    controles = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'Tela-de-controles.png')),(globals.WIDTH, globals.HEIGHT)).convert_alpha()
     back_button = Button('Voltar', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, globals.HEIGHT - 50, 150, 40, 'center', 'center')
     back_button.border_radius = back_button.rect.height / 2
     all_buttons.add(back_button)
@@ -41,7 +27,7 @@ def controls():
                     if back_button.rect.collidepoint(pg.mouse.get_pos()):
                         running = False
 
-        globals.screen.fill(colors.BLACK)
+        globals.screen.blit(controles, (0, 0))
 
         all_sprites.update()
         all_buttons.update()
