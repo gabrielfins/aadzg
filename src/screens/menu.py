@@ -9,15 +9,15 @@ def world_select():
 
     interface = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'world-select.png')), (globals.WIDTH, globals.HEIGHT)).convert_alpha()
     
-    world1_button = Button('Ilha Dos Devorados', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 300, 260, 40, 'center', 'center')
+    world1_button = Button('Ilha Dos Devorados', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 300, 300, 40, 'center', 'center')
     world1_button.border_radius = world1_button.rect.height / 2
     all_buttons.add(world1_button)
 
-    world2_button = Button('Litoral Misterioso', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 360, 226, 40, 'center', 'center')
+    world2_button = Button('Litoral Misterioso', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 360, 300, 40, 'center', 'center')
     world2_button.border_radius = world2_button.rect.height / 2
     all_buttons.add(world2_button)
 
-    world3_button = Button('Deserto dos Infectados', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 420, 266, 40, 'center', 'center')
+    world3_button = Button('Deserto dos Infectados', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, 420, 300, 40, 'center', 'center')
     world3_button.border_radius = world3_button.rect.height / 2
     all_buttons.add(world3_button)
 

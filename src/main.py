@@ -8,7 +8,7 @@ all_buttons = sprites.ButtonGroup()
 
 mixer.init()
 mixer.music.load(os.path.join(paths.resources_folder, 'Tema_fundo.mp3'))
-mixer.music.set_volume(0.2)
+mixer.music.set_volume(0.08)
 mixer.music.play(-1)
 
 interface = pg.transform.scale(pg.image.load(os.path.join(paths.images_folder, 'interface.png')), (globals.WIDTH, globals.HEIGHT)).convert_alpha()
@@ -21,7 +21,7 @@ controls_button = Button('Controles', 24, colors.DARKBLUE, colors.CYANBLUE, glob
 controls_button.border_radius = play_button.rect.height / 2
 all_buttons.add(controls_button)
 
-exit_button = Button('Sair', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, globals.HEIGHT - 116, 150, 40, 'center', 'center')
+exit_button = Button('Sair', 24, colors.DARKBLUE, colors.CYANBLUE, globals.WIDTH / 2, globals.HEIGHT - 50, 150, 40, 'center', 'center')
 exit_button.border_radius = exit_button.rect.height / 2
 all_buttons.add(exit_button)
 
